@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="dhGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0E6B41"/>
+      <stop offset="100%" stop-color="#073B24"/>
+    </linearGradient>
+  </defs>
+  <!-- Fondo redondeado con verde editorial -->
+  <rect width="64" height="64" rx="14" fill="url(#dhGrad)"/>
+  <rect x="1" y="1" width="62" height="62" rx="13" fill="none" stroke="#46C285" stroke-width="1.5" stroke-opacity="0.5"/>
+  
+  <!-- Icono de Servidores Debatehosting -->
+  <g fill="none" stroke="#FAF7EE" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" transform="translate(14, 14)">
+    <!-- Servidor superior -->
+    <rect x="0" y="2" width="36" height="12" rx="3" fill="rgba(255,255,255,0.1)"/>
+    <line x1="6" y1="8" x2="6.01" y2="8" stroke="#46C285" stroke-width="4"/>
+    <line x1="12" y1="8" x2="12.01" y2="8" stroke="#FAF7EE" stroke-width="3"/>
+    <line x1="26" y1="8" x2="30" y2="8"/>
+
+    <!-- Servidor inferior -->
+    <rect x="0" y="20" width="36" height="12" rx="3" fill="rgba(255,255,255,0.1)"/>
+    <line x1="6" y1="26" x2="6.01" y2="26" stroke="#46C285" stroke-width="4"/>
+    <line x1="12" y1="26" x2="12.01" y2="26" stroke="#FAF7EE" stroke-width="3"/>
+    <line x1="26" y1="26" x2="30" y2="26"/>
+    
+    <!-- Pulso central -->
+    <circle cx="18" cy="17" r="2.5" fill="#46C285" stroke="none"/>
+  </g>
+</svg>
