@@ -26,6 +26,14 @@ class RedirectController extends Controller
 
         $destination = $provider->affiliate_url ?: 'https://'.$provider->slug.'.com';
 
+        // Si se solicita un plan específico y tiene URL propia, usarla; si no, hereda la del proveedor
+        if ($request->filled('plan')) {
+            $product = $provider->products()->find($request->input('plan'));
+            if ($product && ! empty($product->affiliate_url)) {
+                $destination = $product->affiliate_url;
+            }
+        }
+
         return redirect()->away($destination, 302, [
             'X-Robots-Tag' => 'noindex, nofollow',
             'Cache-Control' => 'no-cache, no-store, must-revalidate',

@@ -42,7 +42,7 @@
                 $discountPct = ($displayBefore > $displayPrice && $displayBefore > 0)
                     ? (int) round((($displayBefore - $displayPrice) / $displayBefore) * 100)
                     : 0;
-                $displayUrl = ($matchedProduct && $matchedProduct->affiliate_url) ? $matchedProduct->affiliate_url : route('go', $p->slug);
+                $displayUrl = $matchedProduct ? route('go', ['slug' => $p->slug, 'plan' => $matchedProduct->id]) : route('go', $p->slug);
             @endphp
             <div style="background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 2rem; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; justify-content: space-between; transition: all 0.15s ease;">
                 <div>

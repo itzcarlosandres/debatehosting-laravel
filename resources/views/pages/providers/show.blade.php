@@ -202,7 +202,7 @@
                                     @endif
                                 </div>
 
-                                <a href="{{ $prod->resolved_affiliate_url ?: route('go', $provider->slug) }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">
+                                <a href="{{ route('go', ['slug' => $provider->slug, 'plan' => $prod->id]) }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">
                                     <span>Ver Plan ↗</span>
                                 </a>
                             </div>

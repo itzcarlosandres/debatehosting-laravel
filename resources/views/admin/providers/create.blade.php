@@ -654,14 +654,17 @@
                 </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: 2fr 2fr auto; gap: 1rem; align-items: flex-end;">
+            <div style="display: grid; grid-template-columns: 2.2fr 1.8fr auto; gap: 1rem; align-items: flex-end;">
                 <div class="form-group" style="margin-bottom: 0;">
                     <label class="form-label" style="font-size: 0.75rem;">Especificaciones Clave (separadas por comas)</label>
                     <input type="text" name="products[${idx}][specs]" value="${escapeHtml(specs)}" placeholder="ej: 1 vCPU, 2GB RAM, 20GB NVMe, cPanel, LiteSpeed" class="form-control" style="font-size: 0.82rem;">
                 </div>
                 <div class="form-group" style="margin-bottom: 0;">
-                    <label class="form-label" style="font-size: 0.75rem;">Enlace Afiliado Específico (Opcional)</label>
-                    <input type="text" name="products[${idx}][affiliate_url]" value="${escapeHtml(affiliateUrl)}" placeholder="Hereda el del proveedor si se deja vacío" class="form-control" style="font-size: 0.82rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                        <label class="form-label" style="font-size: 0.75rem; margin-bottom: 0;">Enlace Específico (Opcional)</label>
+                        <span style="font-size: 0.68rem; color: var(--emerald-primary); font-family: var(--font-mono);">✓ Automático</span>
+                    </div>
+                    <input type="text" name="products[${idx}][affiliate_url]" value="${escapeHtml(affiliateUrl)}" placeholder="Vacío = hereda enlace del proveedor" class="form-control" style="font-size: 0.82rem; background: rgba(0,0,0,0.2);">
                 </div>
                 <div class="form-group" style="margin-bottom: 0; padding-bottom: 0.5rem;">
                     <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.8rem; color: #FFFFFF;">
