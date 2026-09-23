@@ -139,7 +139,7 @@ class Review extends Model
                 $pText = trim(implode(' ', $paragraphBuffer));
                 if (! empty($pText)) {
                     $enriched = $this->enrichSeoText(e($pText));
-                    $html .= '<p class="editorial-p">'.$enriched.'</p>';
+                    $html .= '<p class="editorial-p">' . $enriched . '</p>';
                 }
                 $paragraphBuffer = [];
             }
@@ -158,7 +158,6 @@ class Review extends Model
 
             if ($trimmed === '') {
                 $flushParagraph();
-
                 continue;
             }
 
@@ -169,17 +168,16 @@ class Review extends Model
                 $title = trim($matches[2]);
 
                 $badgeHtml = $num
-                    ? '<span class="editorial-badge"><i data-lucide="check-circle" style="width: 13px; height: 13px;"></i> SECCIÓN '.$num.'</span>'
+                    ? '<span class="editorial-badge"><i data-lucide="check-circle" style="width: 13px; height: 13px;"></i> SECCIÓN ' . $num . '</span>'
                     : '<span class="editorial-badge"><i data-lucide="bookmark" style="width: 13px; height: 13px;"></i> ANÁLISIS TÉCNICO</span>';
 
                 $html .= '<div class="editorial-card-section">';
                 $html .= '<div class="editorial-card-header">';
                 $html .= $badgeHtml;
-                $html .= '<h3 class="editorial-card-title">'.e($title).'</h3>';
+                $html .= '<h3 class="editorial-card-title">' . e($title) . '</h3>';
                 $html .= '</div>';
                 $html .= '<div class="editorial-card-body">';
                 $currentSection = true;
-
                 continue;
             }
 
@@ -187,8 +185,7 @@ class Review extends Model
             if (preg_match('/^[•\-\*]\s+(.+)$/u', $trimmed, $m)) {
                 $flushParagraph();
                 $itemText = $this->enrichSeoText(e(trim($m[1])));
-                $html .= '<div class="editorial-list-item"><i data-lucide="check" style="width: 16px; height: 16px; color: var(--emerald-primary); flex-shrink: 0; margin-top: 3px;"></i><span>'.$itemText.'</span></div>';
-
+                $html .= '<div class="editorial-list-item"><i data-lucide="check" style="width: 16px; height: 16px; color: var(--emerald-primary); flex-shrink: 0; margin-top: 3px;"></i><span>' . $itemText . '</span></div>';
                 continue;
             }
 
@@ -238,16 +235,17 @@ class Review extends Model
 
         // Resaltar palabras clave únicamente fuera de tags HTML existentes
         $escapedKeywords = array_map(fn ($k) => preg_quote($k, '/'), $keywords);
-        $regex = '/<[^>]+>|(\b(?:'.implode('|', $escapedKeywords).')\b)/iu';
+        $regex = '/<[^>]+>|(\b(?:' . implode('|', $escapedKeywords) . ')\b)/iu';
 
         $text = preg_replace_callback($regex, function ($m) {
             if (! isset($m[1]) || $m[1] === '') {
                 return $m[0];
             }
 
-            return '<strong class="seo-keyword">'.$m[1].'</strong>';
+            return '<strong class="seo-keyword">' . $m[1] . '</strong>';
         }, $text);
 
         return $text;
     }
 }
+

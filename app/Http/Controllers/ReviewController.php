@@ -18,9 +18,9 @@ class ReviewController extends Controller
             $cat = $request->categoria;
             $query->where(function ($q) use ($cat) {
                 $q->where('target_category', $cat)
-                    ->orWhereHas('provider', function ($pq) use ($cat) {
-                        $pq->whereJsonContains('categories', $cat);
-                    });
+                  ->orWhereHas('provider', function ($pq) use ($cat) {
+                      $pq->whereJsonContains('categories', $cat);
+                  });
             });
         }
 
@@ -29,11 +29,11 @@ class ReviewController extends Controller
             $search = $request->q;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('summary', 'like', "%{$search}%")
-                    ->orWhere('provider_name', 'like', "%{$search}%")
-                    ->orWhereHas('provider', function ($pq) use ($search) {
-                        $pq->where('name', 'like', "%{$search}%");
-                    });
+                  ->orWhere('summary', 'like', "%{$search}%")
+                  ->orWhere('provider_name', 'like', "%{$search}%")
+                  ->orWhereHas('provider', function ($pq) use ($search) {
+                      $pq->where('name', 'like', "%{$search}%");
+                  });
             });
         }
 
@@ -63,7 +63,7 @@ class ReviewController extends Controller
         ])->where('slug', $slug);
 
         // Si no está autenticado como administrador, solo puede ver publicadas
-        if (! auth()->check()) {
+        if (!auth()->check()) {
             $query->published();
         }
 

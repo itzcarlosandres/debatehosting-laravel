@@ -96,7 +96,7 @@ class AdminSectionsController extends Controller
         // 3. Guardar Los Elegidos (Picks del Podio)
         if ($request->has('picks') && is_array($request->picks)) {
             foreach ($request->picks as $pos => $pData) {
-                if (! empty($pData['provider_id'])) {
+                if (!empty($pData['provider_id'])) {
                     Pick::updateOrCreate(
                         ['position' => $pos],
                         [

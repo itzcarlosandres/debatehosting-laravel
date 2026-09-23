@@ -21,10 +21,10 @@ class AdminReviewController extends Controller
             $search = $request->q;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('provider_name', 'like', "%{$search}%")
-                    ->orWhereHas('provider', function ($pq) use ($search) {
-                        $pq->where('name', 'like', "%{$search}%");
-                    });
+                  ->orWhere('provider_name', 'like', "%{$search}%")
+                  ->orWhereHas('provider', function ($pq) use ($search) {
+                      $pq->where('name', 'like', "%{$search}%");
+                  });
             });
         }
 
@@ -78,8 +78,8 @@ class AdminReviewController extends Controller
             'published_at' => 'nullable|date',
         ]);
 
-        $validated['slug'] = ! empty($validated['slug']) ? Str::slug($validated['slug']) : Str::slug($validated['title']);
-
+        $validated['slug'] = !empty($validated['slug']) ? Str::slug($validated['slug']) : Str::slug($validated['title']);
+        
         // Asegurar unicidad si el slug generado colisiona
         $baseSlug = $validated['slug'];
         $counter = 1;
@@ -129,7 +129,7 @@ class AdminReviewController extends Controller
             'published_at' => 'nullable|date',
         ]);
 
-        $validated['slug'] = ! empty($validated['slug']) ? Str::slug($validated['slug']) : Str::slug($validated['title']);
+        $validated['slug'] = !empty($validated['slug']) ? Str::slug($validated['slug']) : Str::slug($validated['title']);
         $validated['published'] = $request->boolean('published');
         $validated['featured'] = $request->boolean('featured');
 
@@ -151,10 +151,10 @@ class AdminReviewController extends Controller
 
     public function togglePublish(Review $review): RedirectResponse
     {
-        $newStatus = ! $review->published;
+        $newStatus = !$review->published;
         $review->update([
             'published' => $newStatus,
-            'published_at' => $newStatus && ! $review->published_at ? now() : $review->published_at,
+            'published_at' => $newStatus && !$review->published_at ? now() : $review->published_at,
         ]);
 
         $statusText = $newStatus ? 'publicada' : 'cambiada a borrador';

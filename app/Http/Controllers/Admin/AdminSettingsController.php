@@ -13,6 +13,7 @@ use App\Models\Subscriber;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 
@@ -74,6 +75,8 @@ class AdminSettingsController extends Controller
             'geminiTemperature' => $settings['geminiTemperature'] ?? '0.5',
         ];
 
+
+
         // Diagnóstico del sistema para pestaña Motor
         $systemInfo = [
             'phpVersion' => PHP_VERSION,
@@ -108,12 +111,12 @@ class AdminSettingsController extends Controller
         if ($request->hasFile('favicon_file')) {
             $file = $request->file('favicon_file');
             $uploadDir = public_path('uploads/branding');
-            if (! File::isDirectory($uploadDir)) {
+            if (!File::isDirectory($uploadDir)) {
                 File::makeDirectory($uploadDir, 0755, true);
             }
-            $filename = 'favicon_'.time().'.'.$file->getClientOriginalExtension();
+            $filename = 'favicon_' . time() . '.' . $file->getClientOriginalExtension();
             $file->move($uploadDir, $filename);
-            Setting::set('faviconUrl', '/uploads/branding/'.$filename);
+            Setting::set('faviconUrl', '/uploads/branding/' . $filename);
         } elseif ($request->filled('faviconUrl')) {
             Setting::set('faviconUrl', $request->faviconUrl);
         }
@@ -122,12 +125,12 @@ class AdminSettingsController extends Controller
         if ($request->hasFile('og_image_file')) {
             $file = $request->file('og_image_file');
             $uploadDir = public_path('uploads/branding');
-            if (! File::isDirectory($uploadDir)) {
+            if (!File::isDirectory($uploadDir)) {
                 File::makeDirectory($uploadDir, 0755, true);
             }
-            $filename = 'og_'.time().'.'.$file->getClientOriginalExtension();
+            $filename = 'og_' . time() . '.' . $file->getClientOriginalExtension();
             $file->move($uploadDir, $filename);
-            Setting::set('ogImageUrl', '/uploads/branding/'.$filename);
+            Setting::set('ogImageUrl', '/uploads/branding/' . $filename);
         } elseif ($request->filled('ogImageUrl')) {
             Setting::set('ogImageUrl', $request->ogImageUrl);
         }
@@ -136,12 +139,12 @@ class AdminSettingsController extends Controller
         if ($request->hasFile('logo_file')) {
             $file = $request->file('logo_file');
             $uploadDir = public_path('uploads/branding');
-            if (! File::isDirectory($uploadDir)) {
+            if (!File::isDirectory($uploadDir)) {
                 File::makeDirectory($uploadDir, 0755, true);
             }
-            $filename = 'logo_'.time().'.'.$file->getClientOriginalExtension();
+            $filename = 'logo_' . time() . '.' . $file->getClientOriginalExtension();
             $file->move($uploadDir, $filename);
-            Setting::set('logoUrl', '/uploads/branding/'.$filename);
+            Setting::set('logoUrl', '/uploads/branding/' . $filename);
         } elseif ($request->filled('logoUrl')) {
             Setting::set('logoUrl', $request->logoUrl);
         }
@@ -176,6 +179,7 @@ class AdminSettingsController extends Controller
             'geminiModel',
             'geminiTemperature',
         ];
+
 
         foreach ($directKeys as $key) {
             if ($request->has($key)) {
@@ -215,7 +219,7 @@ class AdminSettingsController extends Controller
         // Podio (Picks) si está en la petición
         if ($request->has('picks') && is_array($request->picks)) {
             foreach ($request->picks as $pos => $pData) {
-                if (! empty($pData['provider_id'])) {
+                if (!empty($pData['provider_id'])) {
                     Pick::updateOrCreate(
                         ['position' => $pos],
                         [
@@ -236,7 +240,6 @@ class AdminSettingsController extends Controller
     public function clearCache()
     {
         Artisan::call('optimize:clear');
-
         return back()->with('success', '¡Caché del sistema y plantillas optimizadas con éxito!');
     }
 }
