@@ -1035,20 +1035,6 @@
                     </div>
                 </a>
 
-                <a href="{{ route('admin.sections.index') }}#podio" class="nav-item-link">
-                    <div class="nav-item-left">
-                        <i data-lucide="trophy" style="width: 15px; height: 15px;"></i>
-                        <span>Los Elegidos</span>
-                    </div>
-                </a>
-
-                <a href="{{ route('admin.settings') }}" class="nav-item-link">
-                    <div class="nav-item-left">
-                        <i data-lucide="radio" style="width: 15px; height: 15px;"></i>
-                        <span>Cinta / Ticker</span>
-                    </div>
-                </a>
-
                 <a href="{{ route('admin.settings', ['tab' => 'engine']) }}" class="nav-item-link">
                     <div class="nav-item-left">
                         <i data-lucide="users" style="width: 15px; height: 15px;"></i>
