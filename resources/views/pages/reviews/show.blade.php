@@ -244,75 +244,137 @@
         margin: 0;
     }
 
-    /* Contenedor Unificado del Artículo (Caja Continua Integrada) */
-    .editorial-article-card {
-        background: var(--bg-surface);
-        border: 1px solid var(--border-color);
-        border-radius: var(--radius-lg);
-        padding: 2.5rem 2.5rem;
-        box-shadow: var(--shadow-sm);
+    /* Contenedor Unificado del Artículo */
+    .review-article-body {
+        display: flex;
+        flex-direction: column;
+        gap: 1.75rem;
         margin-bottom: 3.5rem;
     }
-    @media (max-width: 640px) {
-        .editorial-article-card {
-            padding: 1.5rem 1.25rem;
-        }
+
+    /* Tarjeta individual de cada bloque de análisis técnico */
+    .editorial-card-section {
+        background: var(--bg-surface, #FFFFFF);
+        border: 1px solid var(--border-color, #E2E8F0);
+        border-radius: var(--radius-lg, 14px);
+        padding: 2rem 2.25rem;
+        box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
+        transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        position: relative;
     }
-    .editorial-section {
-        margin-bottom: 2rem;
+    .editorial-card-section:hover {
+        border-color: rgba(16, 185, 129, 0.35);
+        box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
     }
-    .editorial-section:last-child {
-        margin-bottom: 0;
-    }
-    .editorial-section + .editorial-section {
-        padding-top: 2.25rem;
-        border-top: 1px solid var(--border-subtle);
-    }
-    .editorial-section-title {
-        font-size: 1.25rem;
-        font-weight: 800;
-        color: var(--text-main);
-        margin: 0 0 1.15rem 0;
-        letter-spacing: -0.015em;
-        line-height: 1.35;
-    }
-    .editorial-p {
-        font-size: 1.05rem;
-        line-height: 1.85;
-        color: var(--text-body);
+
+    /* Cabecera del bloque: número de sección alineado con el título */
+    .editorial-card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
         margin-bottom: 1.25rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border-subtle, #F1F5F9);
+    }
+
+    /* Píldora con número de auditoría (01, 02, etc.) sin la palabra 'SECCIÓN' */
+    .editorial-num-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--emerald-primary, #059669);
+        border: 1px solid rgba(16, 185, 129, 0.25);
+        font-family: var(--font-mono, monospace);
+        font-weight: 800;
+        font-size: 0.85rem;
+        padding: 0.25rem 0.65rem;
+        border-radius: 8px;
+        flex-shrink: 0;
+        letter-spacing: 0.02em;
+    }
+
+    /* Título de la tarjeta editorial */
+    .editorial-card-title {
+        font-size: 1.18rem;
+        font-weight: 800;
+        color: var(--text-main, #0F172A);
+        line-height: 1.35;
+        margin: 0;
+        letter-spacing: -0.015em;
+    }
+
+    /* Cuerpo y párrafos */
+    .editorial-card-body {
+        font-size: 1rem;
+        line-height: 1.85;
+        color: var(--text-body, #334155);
+    }
+
+    .editorial-p {
+        font-size: 1.02rem;
+        line-height: 1.85;
+        color: var(--text-body, #334155);
+        margin-bottom: 1.15rem;
     }
     .editorial-p:last-child {
         margin-bottom: 0;
     }
 
-    /* Resaltados SEO Enriquecidos */
-    .seo-highlight {
-        color: var(--text-main);
-        font-weight: 700;
-        background: rgba(16, 185, 129, 0.09);
-        border-bottom: 2px solid var(--emerald-primary);
-        padding: 0.05rem 0.25rem;
-        border-radius: 3px;
-        display: inline;
-    }
-    .seo-keyword {
-        color: var(--emerald-primary);
-        font-weight: 700;
-        background: rgba(16, 185, 129, 0.08);
-        padding: 0.05rem 0.25rem;
-        border-radius: 4px;
-        display: inline;
-    }
-
+    /* Lista de viñetas en la auditoría */
     .editorial-list-item {
         display: flex;
         align-items: flex-start;
         gap: 0.65rem;
-        font-size: 1.02rem;
-        line-height: 1.7;
-        color: var(--text-body);
+        padding: 0.75rem 1rem;
+        background: var(--bg-subtle, #F8FAFC);
+        border: 1px solid var(--border-color, #E2E8F0);
+        border-radius: 8px;
         margin-bottom: 0.65rem;
+        font-size: 0.95rem;
+        line-height: 1.65;
+        color: var(--text-main, #1E293B);
+    }
+
+    /* Resaltados SEO Enriquecidos */
+    .seo-keyword {
+        color: #047857;
+        font-weight: 700;
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid rgba(16, 185, 129, 0.25);
+        padding: 0.1rem 0.45rem;
+        border-radius: 5px;
+        font-size: 0.92em;
+        display: inline-block;
+        vertical-align: baseline;
+    }
+
+    .seo-highlight {
+        color: var(--text-main, #0F172A);
+        font-weight: 700;
+        background: rgba(245, 158, 11, 0.1);
+        border-bottom: 2px solid #F59E0B;
+        padding: 0.05rem 0.3rem;
+        border-radius: 3px;
+        display: inline;
+    }
+
+    @media (max-width: 640px) {
+        .editorial-card-section {
+            padding: 1.35rem 1.15rem;
+        }
+        .editorial-card-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+        .editorial-card-title {
+            font-size: 1.08rem;
+        }
+        .editorial-p {
+            font-size: 0.96rem;
+            line-height: 1.75;
+        }
     }
 </style>
 <script>

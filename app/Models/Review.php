@@ -161,19 +161,22 @@ class Review extends Model
                 continue;
             }
 
-            // Detectar encabezados numerados (ej: "1. INFRAESTRUCTURA..." o "## 1. Titulo")
-            if (preg_match('/^(?:#{1,4}\s*)?(?:(\d+)[\.\)]\s+)?([A-ZÁÉÍÓÚÑ0-9\s,\-\/¿\?:]{5,100})$/u', $trimmed, $matches) && ! str_ends_with($trimmed, '.')) {
+            // Detectar encabezados numerados (ej: "1. INFRAESTRUCTURA..." o "## 1. Titulo" o "SECCIÓN 1: ...")
+            if (preg_match('/^(?:#{1,4}\s*)?(?:(?:SECCI[ÓO]N\s*)?(\d+)[\.:\)\-]\s*)?([A-ZÁÉÍÓÚÑ0-9\s,\-\/¿\?:]{5,100})$/ui', $trimmed, $matches) && ! str_ends_with($trimmed, '.')) {
                 $closeSection();
                 $num = ! empty($matches[1]) ? str_pad($matches[1], 2, '0', STR_PAD_LEFT) : null;
                 $title = trim($matches[2]);
+                // Eliminar cualquier residuo de la palabra SECCIÓN o números al inicio del título
+                $title = trim(preg_replace('/^SECCI[ÓO]N\s*\d*[:\.\-]?\s*/ui', '', $title));
+                $title = trim(preg_replace('/^\d+[\.\)]\s*/u', '', $title));
 
-                $badgeHtml = $num
-                    ? '<span class="editorial-badge"><i data-lucide="check-circle" style="width: 13px; height: 13px;"></i> SECCIÓN ' . $num . '</span>'
-                    : '<span class="editorial-badge"><i data-lucide="bookmark" style="width: 13px; height: 13px;"></i> ANÁLISIS TÉCNICO</span>';
+                $numPill = $num
+                    ? '<span class="editorial-num-pill">' . $num . '</span>'
+                    : '<span class="editorial-num-pill"><i data-lucide="shield-check" style="width: 14px; height: 14px;"></i></span>';
 
                 $html .= '<div class="editorial-card-section">';
                 $html .= '<div class="editorial-card-header">';
-                $html .= $badgeHtml;
+                $html .= $numPill;
                 $html .= '<h3 class="editorial-card-title">' . e($title) . '</h3>';
                 $html .= '</div>';
                 $html .= '<div class="editorial-card-body">';
