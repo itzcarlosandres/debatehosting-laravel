@@ -1,129 +1,800 @@
 @extends('layouts.admin')
 
-@section('title', 'Editar ' . $provider->name . ' — DebateHosting Admin')
+@section('title', 'Editar ' . $provider->name)
 
 @section('content')
-<div class="page-header">
+<div class="admin-page-header">
     <div>
-        <h1 style="font-size: 1.8rem; font-weight: 700;">Editar Proveedor: {{ $provider->name }}</h1>
-        <p style="color: var(--text-muted); font-size: 0.9rem;">Modifica los datos, notas o sube un nuevo logo oficial.</p>
+        <h1 class="page-header-title">Editar Proveedor: {{ $provider->name }}</h1>
+        <p class="page-header-subtitle">Actualiza métricas de benchmarking, notas técnicas, pros, contras y metadatos SEO.</p>
     </div>
-    <a href="{{ route('admin.providers.index') }}" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">← Volver</a>
+    <div class="page-header-actions">
+        <a href="{{ route('providers.show', $provider->slug) }}" target="_blank" class="btn-secondary">
+            <i data-lucide="external-link" style="width: 14px; height: 14px;"></i>
+            <span>Ver Ficha Pública</span>
+        </a>
+        <a href="{{ route('admin.providers.index') }}" class="btn-secondary">
+            <i data-lucide="arrow-left" style="width: 14px; height: 14px;"></i>
+            <span>Volver</span>
+        </a>
+    </div>
 </div>
 
 @if($errors->any())
-    <div style="background: #7F1D1D; color: #FECACA; padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem;">
-        <ul style="margin-left: 1.5rem;">
-            @foreach($errors->all() as $err)
-                <li>{{ $err }}</li>
-            @endforeach
-        </ul>
+    <div class="toast-banner error">
+        <div>
+            <div style="font-weight: 700; margin-bottom: 0.25rem;">Por favor corrige los errores antes de continuar:</div>
+            <ul style="margin-left: 1.25rem; font-size: 0.82rem;">
+                @foreach($errors->all() as $err)
+                    <li>{{ $err }}</li>
+                @endforeach
+            </ul>
+        </div>
     </div>
 @endif
 
-<form action="{{ route('admin.providers.update', $provider) }}" method="POST" enctype="multipart/form-data" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 2rem; max-width: 900px;">
+<!-- =========================================================================
+     ASISTENTE IA PARA REGENERACIÓN / MEJORA
+     ========================================================================= -->
+<div class="form-panel" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(20, 24, 33, 0.95) 100%); border: 1.5px solid rgba(16, 185, 129, 0.35); box-shadow: 0 4px 24px rgba(16, 185, 129, 0.08); max-width: 960px;">
+    <div style="display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+        <div>
+            <div style="display: inline-flex; align-items: center; gap: 0.4rem; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; color: var(--emerald-primary); background: var(--emerald-subtle); padding: 0.2rem 0.55rem; border-radius: 4px; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.06em;">
+                <i data-lucide="sparkles" style="width: 12px; height: 12px;"></i>
+                <span>Asistente IA para Regenerar o Mejorar</span>
+            </div>
+            <h2 style="font-size: 1.15rem; font-weight: 800; color: #FFFFFF; letter-spacing: -0.01em;">Regenerar Análisis, Pros, Contras y SEO con IA</h2>
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem;">
+                Pulsa para reescribir con IA la descripción técnica, pros/contras actualizados y optimizar las etiquetas SEO de este proveedor.
+            </p>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 2fr 1.5fr auto; gap: 1rem; align-items: flex-end;">
+        <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" style="color: var(--emerald-primary);">Nombre de la Empresa</label>
+            <input type="text" id="ai-provider-name" value="{{ $provider->name }}" class="form-control" style="border-color: rgba(16, 185, 129, 0.3); background-color: rgba(16, 20, 26, 0.9);">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Enfoque / Especialidad (Opcional)</label>
+            <input type="text" id="ai-provider-focus" placeholder="ej: WordPress, VPS, Cloud..." class="form-control" style="background-color: rgba(16, 20, 26, 0.9);">
+        </div>
+
+        <button type="button" id="btn-generate-ai" onclick="generateWithAI()" class="btn-primary" style="height: 40px; padding: 0 1.25rem; white-space: nowrap;">
+            <i data-lucide="sparkles" style="width: 15px; height: 15px;"></i>
+            <span id="btn-ai-text">Regenerar con IA</span>
+        </button>
+    </div>
+
+    <!-- Indicador de Carga y Mensajes del Asistente -->
+    <div id="ai-status" style="display: none; margin-top: 1rem; padding: 0.75rem 1rem; border-radius: 6px; font-size: 0.82rem;"></div>
+</div>
+
+<form id="provider-form" action="{{ route('admin.providers.update', $provider) }}" method="POST" enctype="multipart/form-data" style="max-width: 960px;">
     @csrf
     @method('PUT')
 
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-        <div class="form-group">
-            <label class="form-label">Nombre de la Marca *</label>
-            <input type="text" name="name" class="form-control" value="{{ old('name', $provider->name) }}" required>
+    <!-- Panel 1: Identidad -->
+    <div class="form-panel">
+        <div class="form-panel-header">
+            <div class="form-panel-title">
+                <i data-lucide="badge-info" style="width: 18px; height: 18px; color: var(--emerald-primary);"></i>
+                <span>1. Identidad de Marca</span>
+            </div>
+            <p class="form-panel-desc">Nombre comercial y logotipo del proveedor.</p>
         </div>
 
-        <div class="form-group">
-            <label class="form-label">Slug URL</label>
-            <input type="text" name="slug" class="form-control" value="{{ old('slug', $provider->slug) }}" required>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
+            <div class="form-group">
+                <label class="form-label">Nombre de la Empresa *</label>
+                <input type="text" id="field-name" name="name" class="form-control" value="{{ old('name', $provider->name) }}" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Slug URL</label>
+                <input type="text" id="field-slug" name="slug" class="form-control" value="{{ old('slug', $provider->slug) }}" required>
+            </div>
+        </div>
+
+        <!-- Vista previa y carga de nuevo logo -->
+        <div class="form-group" style="background: var(--bg-card-subtle); border: 1px dashed var(--border-medium); border-radius: var(--radius-sm); padding: 1.25rem; margin-top: 0.5rem;">
+            <label class="form-label" style="color: #FFFFFF;">Logotipo Actual</label>
+            <div style="display: flex; align-items: center; gap: 1.25rem; margin-bottom: 1rem;">
+                @if($provider->resolved_logo_url)
+                    <div style="background: #FFFFFF; padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-subtle); display: inline-flex; align-items: center;">
+                        <img src="{{ $provider->resolved_logo_url }}" alt="{{ $provider->name }}" style="height: 38px; max-width: 130px; object-fit: contain;">
+                    </div>
+                    <span style="font-size: 0.8rem; color: var(--emerald-primary); display: flex; align-items: center; gap: 0.3rem;">
+                        <i data-lucide="check" style="width: 14px; height: 14px;"></i>
+                        <span>Logo vinculado correctamente</span>
+                    </span>
+                @else
+                    <span style="font-size: 0.8rem; color: var(--text-dim);">Sin logotipo asignado</span>
+                @endif
+            </div>
+
+            <label class="form-label" style="font-size: 0.76rem;">Reemplazar logotipo (opcional):</label>
+            <input type="file" name="logo" accept="image/*" class="form-control" style="background: var(--bg-input);">
         </div>
     </div>
 
-    <!-- Subida / Edición de Logo -->
-    <div class="form-group" style="background: #0F172A; border: 1px dashed var(--border-color); padding: 1.25rem; border-radius: 6px;">
-        <label class="form-label" style="color: #fff; font-weight: 700;">Logotipo Actual y Cambio</label>
-        
-        <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1rem;">
-            @if($provider->resolved_logo_url)
-                <div style="background: #1E293B; padding: 0.5rem; border-radius: 6px; border: 1px solid var(--border-color);">
-                    <img src="{{ $provider->resolved_logo_url }}" alt="{{ $provider->name }}" style="height: 48px; max-width: 120px; object-fit: contain;">
+    <!-- Panel 2: Categorías & Distintivo -->
+    <div class="form-panel">
+        <div class="form-panel-header">
+            <div class="form-panel-title">
+                <i data-lucide="layers" style="width: 18px; height: 18px; color: var(--emerald-primary);"></i>
+                <span>2. Categorías & Distintivo</span>
+            </div>
+            <p class="form-panel-desc">Selecciona las etiquetas aplicables para los filtros y define el distintivo visual del proveedor.</p>
+        </div>
+
+        <!-- Categorías del Proveedor -->
+        <div class="form-group" style="margin-bottom: 2rem;">
+            <label class="form-label" style="font-weight: 700; color: #FFFFFF; font-size: 0.82rem; letter-spacing: 0.05em; margin-bottom: 0.85rem;">
+                CATEGORÍAS DEL PROVEEDOR * (SELECCIONA LAS APLICABLES PARA LOS FILTROS)
+            </label>
+
+            <div id="categories-container" style="display: flex; flex-wrap: wrap; gap: 0.65rem; margin-bottom: 0.85rem;">
+                @php
+                    $selectedCategories = old('categories', $provider->categories ?? ['hosting']);
+                    if (is_string($selectedCategories)) {
+                        $selectedCategories = json_decode($selectedCategories, true) ?: [];
+                    }
+                    if (!is_array($selectedCategories)) {
+                        $selectedCategories = [];
+                    }
+                @endphp
+
+                @foreach($categories as $cat)
+                    @php
+                        $isSelected = in_array($cat->slug, $selectedCategories) || in_array($cat->name, $selectedCategories);
+                    @endphp
+                    <button type="button" 
+                            class="category-toggle-pill {{ $isSelected ? 'is-selected' : '' }}" 
+                            data-slug="{{ $cat->slug }}"
+                            onclick="toggleCategoryPill(this, '{{ $cat->slug }}')">
+                        <span class="pill-prefix">{{ $isSelected ? '✓' : '+' }}</span>
+                        <span class="pill-name">{{ $cat->name }}</span>
+                        <input type="checkbox" name="categories[]" value="{{ $cat->slug }}" {{ $isSelected ? 'checked' : '' }} style="display: none;">
+                    </button>
+                @endforeach
+            </div>
+
+            <!-- Input para añadir categoría personalizada -->
+            <div style="display: flex; gap: 0.5rem; max-width: 600px;">
+                <input type="text" id="custom-category-input" class="form-control" placeholder="Añadir otra categoría personalizada..." style="font-size: 0.85rem;" onkeydown="if(event.key === 'Enter'){ event.preventDefault(); addCustomCategory(); }">
+                <button type="button" onclick="addCustomCategory()" class="btn-secondary" style="white-space: nowrap; padding: 0 1.1rem; height: 38px;">
+                    <i data-lucide="plus" style="width: 14px; height: 14px;"></i>
+                    <span>Añadir</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Badge / Distintivo del Proveedor -->
+        <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" style="font-weight: 700; color: #FFFFFF; font-size: 0.82rem; letter-spacing: 0.05em; margin-bottom: 0.85rem;">
+                BADGE / DISTINTIVO DEL PROVEEDOR (OPCIONAL)
+            </label>
+
+            @php
+                $currentBadge = old('badge', $provider->badge ?? '');
+                $currentBadgeColor = old('badge_color', $provider->badge_color ?? 'green');
+
+                $presetBadges = [
+                    ['label' => 'HOT', 'color' => 'red'],
+                    ['label' => 'MEJOR PRECIO', 'color' => 'green'],
+                    ['label' => 'TOP RENDIMIENTO', 'color' => 'gold'],
+                    ['label' => 'ELECCIÓN EDITORIAL', 'color' => 'dark'],
+                    ['label' => 'RECOMENDADO', 'color' => 'green'],
+                ];
+
+                $allBadges = $presetBadges;
+                foreach($badges as $b) {
+                    $exists = false;
+                    foreach($allBadges as $ab) {
+                        if (strtoupper($ab['label']) === strtoupper($b->label)) { $exists = true; break; }
+                    }
+                    if (!$exists) {
+                        $allBadges[] = ['label' => $b->label, 'color' => $b->color];
+                    }
+                }
+            @endphp
+
+            <input type="hidden" name="badge" id="field-badge" value="{{ $currentBadge }}">
+            <input type="hidden" name="badge_color" id="field-badge-color" value="{{ $currentBadgeColor }}">
+
+            <div id="badges-container" style="display: flex; flex-wrap: wrap; gap: 0.65rem;">
+                <button type="button" 
+                        class="badge-select-pill {{ empty($currentBadge) ? 'is-selected' : '' }}" 
+                        data-label="" 
+                        data-color="" 
+                        onclick="selectBadgePill(this, '', '')">
+                    <span class="pill-prefix">{{ empty($currentBadge) ? '✓ ' : '' }}</span>
+                    <span>Sin Badge</span>
+                </button>
+
+                @foreach($allBadges as $b)
+                    @php
+                        $isSelected = (strtoupper($currentBadge) === strtoupper($b['label']));
+                    @endphp
+                    <button type="button" 
+                            class="badge-select-pill badge-pill-{{ $b['color'] }} {{ $isSelected ? 'is-selected' : '' }}" 
+                            data-label="{{ $b['label'] }}" 
+                            data-color="{{ $b['color'] }}" 
+                            onclick="selectBadgePill(this, '{{ $b['label'] }}', '{{ $b['color'] }}')">
+                        <span class="pill-prefix">{{ $isSelected ? '✓ ' : '' }}</span>
+                        <span>{{ $b['label'] }}</span>
+                    </button>
+                @endforeach
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel 3: Plan Auditado y Tarifas -->
+    <div class="form-panel">
+        <div class="form-panel-header">
+            <div class="form-panel-title">
+                <i data-lucide="tag" style="width: 18px; height: 18px; color: var(--sky-primary);"></i>
+                <span>3. Plan Auditado & Tarifas</span>
+            </div>
+            <p class="form-panel-desc">Configuración del plan base evaluado en las comparativas.</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1.25rem;">
+            <div class="form-group">
+                <label class="form-label">Nombre del Plan Auditado *</label>
+                <input type="text" id="field-plan" name="plan" class="form-control" value="{{ old('plan', $provider->plan) }}" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Precio Oferta ($) *</label>
+                <input type="number" step="0.01" id="field-price-from" name="price_from" class="form-control" value="{{ old('price_from', $provider->price_from) }}" required style="font-family: var(--font-mono);">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Precio Regular Antes ($)</label>
+                <input type="number" step="0.01" id="field-price-before" name="price_before" class="form-control" value="{{ old('price_before', $provider->price_before) }}" required style="font-family: var(--font-mono);">
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel 4: Catálogo Multi-Producto & Planes (Hosting, VPS, Dedicados, etc.) -->
+    <div class="form-panel">
+        <div class="form-panel-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <div class="form-panel-title">
+                    <i data-lucide="layers" style="width: 18px; height: 18px; color: var(--emerald-primary);"></i>
+                    <span>4. Catálogo Multi-Producto & Planes (Hosting, VPS, Dedicados...)</span>
                 </div>
-                <span style="font-size: 0.85rem; color: var(--accent);">✔ Logo actual cargado</span>
-            @else
-                <span style="font-size: 0.85rem; color: var(--text-muted);">Sin logo asignado actualmente</span>
-            @endif
+                <p class="form-panel-desc">
+                    Asocia los diferentes productos y planes que vende esta empresa para que al filtrar en <code>/ofertas?categoria=vps</code> o en su ficha pública aparezcan sus planes específicos con su precio real sin duplicar el proveedor.
+                </p>
+            </div>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button type="button" onclick="autofillProductsWithAI()" id="btn-ai-products" class="btn-secondary" style="font-size: 0.8rem; background: rgba(16, 185, 129, 0.12); color: var(--emerald-light); border-color: rgba(16, 185, 129, 0.35);">
+                    <i data-lucide="sparkles" style="width: 14px; height: 14px;"></i>
+                    <span id="btn-ai-products-text">✨ Autocompletar Planes con IA</span>
+                </button>
+                <button type="button" onclick="addProductRow()" class="btn-primary" style="font-size: 0.8rem;">
+                    <i data-lucide="plus" style="width: 14px; height: 14px;"></i>
+                    <span>Añadir Producto</span>
+                </button>
+            </div>
         </div>
 
-        <label class="form-label">Seleccionar nuevo archivo de logo para reemplazar:</label>
-        <input type="file" name="logo" accept="image/*" class="form-control" style="background: var(--bg-card);">
-    </div>
+        <div id="ai-products-status" style="display: none; margin-bottom: 1rem; padding: 0.65rem 1rem; border-radius: 6px; font-size: 0.8rem;"></div>
 
-    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1.5rem;">
-        <div class="form-group">
-            <label class="form-label">Plan Recomendado / Auditado *</label>
-            <input type="text" name="plan" class="form-control" value="{{ old('plan', $provider->plan) }}" required>
-        </div>
-
-        <div class="form-group">
-            <label class="form-label">Precio Promocional ($) *</label>
-            <input type="number" step="0.01" name="price_from" class="form-control" value="{{ old('price_from', $provider->price_from) }}" required>
-        </div>
-
-        <div class="form-group">
-            <label class="form-label">Precio Regular Antes ($)</label>
-            <input type="number" step="0.01" name="price_before" class="form-control" value="{{ old('price_before', $provider->price_before) }}" required>
+        <div id="products-container" style="display: flex; flex-direction: column; gap: 1rem;">
+            <!-- Renderizado dinámicamente con JavaScript -->
         </div>
     </div>
 
-    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem;">
-        <div class="form-group">
-            <label class="form-label">Nota Precio (0-10)</label>
-            <input type="number" step="0.1" min="0" max="10" name="score_precio" class="form-control" value="{{ old('score_precio', $provider->score_precio) }}" required>
+    <!-- Panel 3: Puntuaciones de La Balanza -->
+    <div class="form-panel">
+        <div class="form-panel-header">
+            <div class="form-panel-title">
+                <i data-lucide="scale" style="width: 18px; height: 18px; color: var(--amber-primary);"></i>
+                <span>3. Telemetría y Notas de La Balanza</span>
+            </div>
+            <p class="form-panel-desc">Puntuaciones técnicas de 0.0 a 10.0.</p>
         </div>
-        <div class="form-group">
-            <label class="form-label">Nota Velocidad (0-10)</label>
-            <input type="number" step="0.1" min="0" max="10" name="score_rendimiento" class="form-control" value="{{ old('score_rendimiento', $provider->score_rendimiento) }}" required>
-        </div>
-        <div class="form-group">
-            <label class="form-label">Nota Soporte (0-10)</label>
-            <input type="number" step="0.1" min="0" max="10" name="score_soporte" class="form-control" value="{{ old('score_soporte', $provider->score_soporte) }}" required>
-        </div>
-        <div class="form-group">
-            <label class="form-label">Uptime (%)</label>
-            <input type="number" step="0.01" min="90" max="100" name="uptime" class="form-control" value="{{ old('uptime', $provider->uptime) }}" required>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1.25rem;">
+            <div class="form-group">
+                <label class="form-label">Precio (0-10)</label>
+                <input type="number" step="0.1" min="0" max="10" id="field-score-precio" name="score_precio" class="form-control" value="{{ old('score_precio', $provider->score_precio) }}" required style="font-family: var(--font-mono);">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Velocidad / TTFB (0-10)</label>
+                <input type="number" step="0.1" min="0" max="10" id="field-score-rendimiento" name="score_rendimiento" class="form-control" value="{{ old('score_rendimiento', $provider->score_rendimiento) }}" required style="font-family: var(--font-mono);">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Soporte 24/7 (0-10)</label>
+                <input type="number" step="0.1" min="0" max="10" id="field-score-soporte" name="score_soporte" class="form-control" value="{{ old('score_soporte', $provider->score_soporte) }}" required style="font-family: var(--font-mono);">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Facilidad / Panel (0-10)</label>
+                <input type="number" step="0.1" min="0" max="10" id="field-score-facilidad" name="score_facilidad" class="form-control" value="{{ old('score_facilidad', $provider->score_facilidad ?: 8.5) }}" required style="font-family: var(--font-mono);">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Uptime Garantizado (%)</label>
+                <input type="number" step="0.01" min="90" max="100" id="field-uptime" name="uptime" class="form-control" value="{{ old('uptime', $provider->uptime) }}" required style="font-family: var(--font-mono);">
+            </div>
         </div>
     </div>
 
-    <div class="form-group">
-        <label class="form-label">Enlace de Afiliado (URL destino)</label>
-        <input type="url" name="affiliate_url" class="form-control" value="{{ old('affiliate_url', $provider->affiliate_url) }}">
-    </div>
-
-    <div class="form-group">
-        <label class="form-label">Veredicto / Análisis Editorial</label>
-        <textarea name="description" rows="3" class="form-control">{{ old('description', $provider->description) }}</textarea>
-    </div>
-
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-        <div class="form-group">
-            <label class="form-label">Puntos Fuertes (Pros)</label>
-            <textarea name="pros" rows="3" class="form-control">{{ old('pros', $provider->pros) }}</textarea>
+    <!-- Panel 4: Afiliación & Veredicto -->
+    <div class="form-panel">
+        <div class="form-panel-header">
+            <div class="form-panel-title">
+                <i data-lucide="award" style="width: 18px; height: 18px; color: var(--rose-primary);"></i>
+                <span>4. Veredicto Editorial & Afiliación</span>
+            </div>
+            <p class="form-panel-desc">Texto de recomendación y enlace de redirección /go/{slug}.</p>
         </div>
+
         <div class="form-group">
-            <label class="form-label">Puntos Débiles (Contras)</label>
-            <textarea name="cons" rows="3" class="form-control">{{ old('cons', $provider->cons) }}</textarea>
+            <label class="form-label">Enlace Oficial / Afiliado (URL Destino)</label>
+            <input type="url" id="field-affiliate-url" name="affiliate_url" class="form-control" value="{{ old('affiliate_url', $provider->affiliate_url) }}" placeholder="https://proveedor.com/?ref=debatehosting" style="font-family: var(--font-mono);">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Análisis / Veredicto Editorial</label>
+            <textarea id="field-description" name="description" rows="3" class="form-control">{{ old('description', $provider->description) }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">¿A quién se recomienda? (Veredicto en 1 línea)</label>
+            <input type="text" id="field-verdict" name="verdict" class="form-control" value="{{ old('verdict', $provider->verdict) }}" placeholder="ej: La opción perfecta para programadores y tiendas WooCommerce con alto tráfico...">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+            <div class="form-group">
+                <label class="form-label">Puntos Fuertes (Pros)</label>
+                <textarea id="field-pros" name="pros" rows="4" class="form-control">{{ old('pros', $provider->pros) }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Puntos Débiles (Contras)</label>
+                <textarea id="field-cons" name="cons" rows="4" class="form-control">{{ old('cons', $provider->cons) }}</textarea>
+            </div>
+        </div>
+
+        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-subtle);">
+            <label class="toggle-label-wrap">
+                <input type="checkbox" name="active" id="active" value="1" {{ old('active', $provider->active) ? 'checked' : '' }}>
+                <span class="toggle-text">Proveedor publicado y visible en el portal</span>
+            </label>
         </div>
     </div>
 
-    <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem;">
-        <input type="checkbox" name="active" id="active" value="1" {{ old('active', $provider->active) ? 'checked' : '' }}>
-        <label for="active" class="form-label" style="margin-bottom: 0; cursor: pointer;">Publicar y mostrar activamente en el sitio</label>
+    <!-- Panel 5: Metadatos SEO -->
+    <div class="form-panel">
+        <div class="form-panel-header">
+            <div class="form-panel-title">
+                <i data-lucide="search" style="width: 18px; height: 18px; color: var(--emerald-primary);"></i>
+                <span>5. Optimización SEO & Indexación</span>
+            </div>
+            <p class="form-panel-desc">Etiquetas Meta optimizadas para mejorar la visibilidad en motores de búsqueda.</p>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Meta Título (Título SEO)</label>
+            <input type="text" id="field-meta-title" name="meta_title" class="form-control" value="{{ old('meta_title', $provider->meta_title) }}" placeholder="ej: Opiniones y Análisis de Hostinger: ¿Vale la pena en 2025? — DebateHosting">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Meta Descripción (Snippet de Google)</label>
+            <textarea id="field-meta-description" name="meta_description" rows="2" class="form-control" placeholder="ej: Auditoría técnica independiente de Hostinger. Analizamos latencia TTFB, precios desde $2.49/mes, pros y contras sin patrocinios.">{{ old('meta_description', $provider->meta_description) }}</textarea>
+        </div>
     </div>
 
     <input type="hidden" name="period" value="{{ $provider->period ?: 'mes' }}">
-    <input type="hidden" name="score_facilidad" value="{{ $provider->score_facilidad ?: 8.5 }}">
 
-    <div style="margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem; display: flex; justify-content: flex-end; gap: 1rem;">
-        <a href="{{ route('admin.providers.index') }}" class="btn-action" style="background: #334155;">Cancelar</a>
-        <button type="submit" class="btn-action">Actualizar Proveedor</button>
+    <!-- Barra de Acciones -->
+    <div class="form-actions-bar">
+        <a href="{{ route('admin.providers.index') }}" class="btn-secondary">Cancelar</a>
+        <button type="submit" class="btn-primary">
+            <i data-lucide="save" style="width: 15px; height: 15px;"></i>
+            <span>Actualizar Proveedor</span>
+        </button>
     </div>
 </form>
+
+@push('admin-scripts')
+<script>
+    function generateWithAI() {
+        const nameInput = document.getElementById('ai-provider-name');
+        const focusInput = document.getElementById('ai-provider-focus');
+        const btn = document.getElementById('btn-generate-ai');
+        const btnText = document.getElementById('btn-ai-text');
+        const statusBox = document.getElementById('ai-status');
+
+        const name = nameInput.value.trim() || document.getElementById('field-name').value.trim();
+
+        if (!name) {
+            statusBox.style.display = 'block';
+            statusBox.style.background = 'rgba(244, 63, 94, 0.12)';
+            statusBox.style.border = '1px solid rgba(244, 63, 94, 0.3)';
+            statusBox.style.color = '#FECDD3';
+            statusBox.innerHTML = '⚠️ Por favor escribe el nombre de la empresa antes de generar.';
+            nameInput.focus();
+            return;
+        }
+
+        btn.disabled = true;
+        btnText.innerText = 'Analizando y Generando...';
+        statusBox.style.display = 'block';
+        statusBox.style.background = 'rgba(16, 185, 129, 0.08)';
+        statusBox.style.border = '1px solid rgba(16, 185, 129, 0.25)';
+        statusBox.style.color = '#A7F3D0';
+        statusBox.innerHTML = '✦ Investigando y redactando ficha editorial para <strong>' + name + '</strong>...';
+
+        fetch('{{ route("admin.ai.generate-provider") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                name: name,
+                focus: focusInput.value.trim()
+            })
+        })
+        .then(response => response.json())
+        .then(res => {
+            btn.disabled = false;
+            btnText.innerText = 'Regenerar con IA';
+
+            if (!res.success || !res.data) {
+                statusBox.style.background = 'rgba(244, 63, 94, 0.12)';
+                statusBox.style.border = '1px solid rgba(244, 63, 94, 0.3)';
+                statusBox.style.color = '#FECDD3';
+                statusBox.innerHTML = '❌ ' + (res.message || 'Error al generar la información.');
+                return;
+            }
+
+            const d = res.data;
+
+            // Rellenar campos del formulario
+            document.getElementById('field-name').value = d.name || name;
+            if (d.plan) document.getElementById('field-plan').value = d.plan;
+            if (d.price_from) document.getElementById('field-price-from').value = d.price_from;
+            if (d.price_before) document.getElementById('field-price-before').value = d.price_before;
+            if (d.score_precio) document.getElementById('field-score-precio').value = d.score_precio;
+            if (d.score_rendimiento) document.getElementById('field-score-rendimiento').value = d.score_rendimiento;
+            if (d.score_soporte) document.getElementById('field-score-soporte').value = d.score_soporte;
+            if (d.score_facilidad) document.getElementById('field-score-facilidad').value = d.score_facilidad;
+            if (d.uptime) document.getElementById('field-uptime').value = d.uptime;
+            if (d.description) document.getElementById('field-description').value = d.description;
+            if (d.pros) document.getElementById('field-pros').value = d.pros;
+            if (d.cons) document.getElementById('field-cons').value = d.cons;
+            if (d.verdict) document.getElementById('field-verdict').value = d.verdict;
+            if (d.meta_title) document.getElementById('field-meta-title').value = d.meta_title;
+            if (d.meta_description) document.getElementById('field-meta-description').value = d.meta_description;
+
+            statusBox.style.background = 'rgba(16, 185, 129, 0.15)';
+            statusBox.style.border = '1px solid rgba(16, 185, 129, 0.4)';
+            statusBox.style.color = '#6EE7B7';
+            statusBox.innerHTML = '✔ ¡Datos actualizados con IA para <strong>' + (d.name || name) + '</strong>! Revisa los cambios y pulsa "Actualizar Proveedor".';
+
+            document.getElementById('field-description').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        })
+        .catch(err => {
+            btn.disabled = false;
+            btnText.innerText = 'Regenerar con IA';
+            statusBox.style.background = 'rgba(244, 63, 94, 0.12)';
+            statusBox.style.border = '1px solid rgba(244, 63, 94, 0.3)';
+            statusBox.style.color = '#FECDD3';
+            statusBox.innerHTML = '❌ Ocurrió un error inesperado al conectar con el asistente IA.';
+        });
+    }
+
+    // Gestión interactiva de Categorías
+    function toggleCategoryPill(btn, slug) {
+        const chk = btn.querySelector('input[type="checkbox"]');
+        chk.checked = !chk.checked;
+        if (chk.checked) {
+            btn.classList.add('is-selected');
+            btn.querySelector('.pill-prefix').innerText = '✓';
+        } else {
+            btn.classList.remove('is-selected');
+            btn.querySelector('.pill-prefix').innerText = '+';
+        }
+    }
+
+    function addCustomCategory() {
+        const input = document.getElementById('custom-category-input');
+        const val = input.value.trim();
+        if (!val) return;
+
+        const slug = val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        const container = document.getElementById('categories-container');
+
+        const existing = container.querySelector(`[data-slug="${slug}"]`);
+        if (existing) {
+            const chk = existing.querySelector('input[type="checkbox"]');
+            if (!chk.checked) {
+                toggleCategoryPill(existing, slug);
+            }
+            input.value = '';
+            return;
+        }
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'category-toggle-pill is-selected';
+        btn.setAttribute('data-slug', slug);
+        btn.onclick = function() { toggleCategoryPill(this, slug); };
+        btn.innerHTML = `
+            <span class="pill-prefix">✓</span>
+            <span class="pill-name">${val}</span>
+            <input type="checkbox" name="categories[]" value="${slug}" checked style="display: none;">
+        `;
+
+        container.appendChild(btn);
+        input.value = '';
+    }
+
+    // Selección de Badge
+    function selectBadgePill(btn, label, color) {
+        document.getElementById('field-badge').value = label;
+        document.getElementById('field-badge-color').value = color;
+
+        document.querySelectorAll('.badge-select-pill').forEach(b => {
+            b.classList.remove('is-selected');
+            const prefix = b.querySelector('.pill-prefix');
+            if (prefix) prefix.innerText = '';
+        });
+
+        btn.classList.add('is-selected');
+        const prefix = btn.querySelector('.pill-prefix');
+        if (prefix) prefix.innerText = '✓ ';
+    }
+
+    @php
+        $catsData = $categories->map(function ($c) {
+            return ['slug' => $c->slug, 'name' => $c->name];
+        })->values();
+
+        $prodsData = $provider->products->map(function ($p) {
+            return [
+                'category_slug' => $p->category_slug,
+                'plan_name' => $p->plan_name,
+                'price_from' => $p->price_from,
+                'price_before' => $p->price_before,
+                'period' => $p->period,
+                'specs' => is_array($p->specs) ? implode(', ', $p->specs) : ($p->specs ?? ''),
+                'affiliate_url' => $p->affiliate_url,
+                'is_featured' => (bool) $p->is_featured,
+            ];
+        })->values();
+    @endphp
+
+    // Multi-Producto y Catálogo de Planes
+    window.availableCategories = {!! json_encode($catsData) !!};
+    window.initialProducts = {!! json_encode($prodsData) !!};
+
+    let productCount = 0;
+
+    function renderProductRow(prod = {}, index = null) {
+        const container = document.getElementById('products-container');
+        if (!container) return;
+        const idx = index !== null ? index : productCount++;
+
+        const categorySlug = prod.category_slug || (window.availableCategories[0] ? window.availableCategories[0].slug : '');
+        const planName = prod.plan_name || '';
+        const priceFrom = prod.price_from !== undefined ? prod.price_from : '';
+        const priceBefore = prod.price_before !== undefined ? prod.price_before : '';
+        const period = prod.period || 'mes';
+        const specs = prod.specs || '';
+        const affiliateUrl = prod.affiliate_url || '';
+        const isFeatured = prod.is_featured ? true : false;
+
+        let categoryOptions = '<option value="">(Sin categoría específica)</option>';
+        window.availableCategories.forEach(cat => {
+            const selected = (cat.slug.toLowerCase() === (categorySlug || '').toLowerCase()) ? 'selected' : '';
+            categoryOptions += `<option value="${cat.slug}" ${selected}>${cat.name}</option>`;
+        });
+
+        const card = document.createElement('div');
+        card.className = 'product-item-card';
+        card.style.cssText = 'background: var(--bg-card-subtle); border: 1px solid var(--border-medium); border-radius: var(--radius-sm); padding: 1.25rem;';
+        card.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.06);">
+                <span class="product-item-badge" style="font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; color: var(--emerald-primary);">
+                    PLAN / SERVICIO #<span class="product-index-num">${container.children.length + 1}</span>
+                </span>
+                <button type="button" onclick="removeProductRow(this)" style="background: none; border: none; color: #F43F5E; cursor: pointer; display: flex; align-items: center; gap: 0.3rem; font-size: 0.78rem;">
+                    <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                    <span>Eliminar</span>
+                </button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1.5fr 2fr 1fr 1fr 1fr; gap: 1rem; margin-bottom: 0.85rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" style="font-size: 0.75rem;">Categoría Destino</label>
+                    <select name="products[${idx}][category_slug]" class="form-control" style="font-size: 0.82rem;">
+                        ${categoryOptions}
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" style="font-size: 0.75rem;">Nombre del Plan *</label>
+                    <input type="text" name="products[${idx}][plan_name]" value="${escapeHtml(planName)}" placeholder="ej: Shared Lite NVMe, VPS KVM 1..." class="form-control" required style="font-size: 0.82rem;">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" style="font-size: 0.75rem;">Precio Oferta ($) *</label>
+                    <input type="number" step="0.01" name="products[${idx}][price_from]" value="${priceFrom}" class="form-control" required style="font-family: var(--font-mono); font-size: 0.82rem;">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" style="font-size: 0.75rem;">Precio Antes ($)</label>
+                    <input type="number" step="0.01" name="products[${idx}][price_before]" value="${priceBefore}" class="form-control" style="font-family: var(--font-mono); font-size: 0.82rem;">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" style="font-size: 0.75rem;">Período</label>
+                    <select name="products[${idx}][period]" class="form-control" style="font-size: 0.82rem;">
+                        <option value="mes" ${period === 'mes' ? 'selected' : ''}>/mes</option>
+                        <option value="año" ${period === 'año' ? 'selected' : ''}>/año</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 2fr 2fr auto; gap: 1rem; align-items: flex-end;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" style="font-size: 0.75rem;">Especificaciones Clave (separadas por comas)</label>
+                    <input type="text" name="products[${idx}][specs]" value="${escapeHtml(specs)}" placeholder="ej: 1 vCPU, 2GB RAM, 20GB NVMe, cPanel, LiteSpeed" class="form-control" style="font-size: 0.82rem;">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" style="font-size: 0.75rem;">Enlace Afiliado Específico (Opcional)</label>
+                    <input type="text" name="products[${idx}][affiliate_url]" value="${escapeHtml(affiliateUrl)}" placeholder="Hereda el del proveedor si se deja vacío" class="form-control" style="font-size: 0.82rem;">
+                </div>
+                <div class="form-group" style="margin-bottom: 0; padding-bottom: 0.5rem;">
+                    <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.8rem; color: #FFFFFF;">
+                        <input type="checkbox" name="products[${idx}][is_featured]" value="1" ${isFeatured ? 'checked' : ''}>
+                        <span>Destacado</span>
+                    </label>
+                </div>
+            </div>
+        `;
+
+        container.appendChild(card);
+        if (window.lucide) window.lucide.createIcons();
+    }
+
+    function addProductRow(data = {}) {
+        renderProductRow(data);
+        renumberProducts();
+    }
+
+    function removeProductRow(btn) {
+        const card = btn.closest('.product-item-card');
+        if (card) {
+            card.remove();
+            renumberProducts();
+        }
+    }
+
+    function renumberProducts() {
+        const container = document.getElementById('products-container');
+        if (!container) return;
+        const badges = container.querySelectorAll('.product-index-num');
+        badges.forEach((b, i) => {
+            b.innerText = i + 1;
+        });
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
+
+    function autofillProductsWithAI() {
+        const name = document.getElementById('field-name').value.trim() || document.getElementById('ai-provider-name').value.trim();
+        const statusBox = document.getElementById('ai-products-status');
+        const btn = document.getElementById('btn-ai-products');
+        const btnText = document.getElementById('btn-ai-products-text');
+
+        if (!name) {
+            statusBox.style.display = 'block';
+            statusBox.style.background = 'rgba(244, 63, 94, 0.12)';
+            statusBox.style.border = '1px solid rgba(244, 63, 94, 0.3)';
+            statusBox.style.color = '#FECDD3';
+            statusBox.innerHTML = '⚠️ Escribe el nombre del proveedor para investigar sus productos con IA.';
+            return;
+        }
+
+        btn.disabled = true;
+        btnText.innerText = 'Investigando planes...';
+        statusBox.style.display = 'block';
+        statusBox.style.background = 'rgba(16, 185, 129, 0.08)';
+        statusBox.style.border = '1px solid rgba(16, 185, 129, 0.25)';
+        statusBox.style.color = '#A7F3D0';
+        statusBox.innerHTML = '✦ Identificando líneas de productos (Hosting, VPS, Dedicados...) de <strong>' + name + '</strong>...';
+
+        fetch('{{ route("admin.ai.generate-products") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({ name: name })
+        })
+        .then(r => r.json())
+        .then(res => {
+            btn.disabled = false;
+            btnText.innerText = '✨ Autocompletar Planes con IA';
+
+            if (!res.success || !res.data || !Array.isArray(res.data) || res.data.length === 0) {
+                statusBox.style.background = 'rgba(244, 63, 94, 0.12)';
+                statusBox.style.border = '1px solid rgba(244, 63, 94, 0.3)';
+                statusBox.style.color = '#FECDD3';
+                statusBox.innerHTML = '❌ ' + (res.message || 'No se pudieron generar los productos con IA.');
+                return;
+            }
+
+            const container = document.getElementById('products-container');
+            container.innerHTML = '';
+            productCount = 0;
+
+            res.data.forEach(p => {
+                const specsStr = Array.isArray(p.specs) ? p.specs.join(', ') : (p.specs || '');
+                renderProductRow({
+                    category_slug: p.category_slug,
+                    plan_name: p.plan_name,
+                    price_from: p.price_from,
+                    price_before: p.price_before,
+                    period: p.period || 'mes',
+                    specs: specsStr,
+                    affiliate_url: p.affiliate_url || '',
+                    is_featured: p.is_featured || false,
+                });
+            });
+
+            renumberProducts();
+
+            statusBox.style.background = 'rgba(16, 185, 129, 0.15)';
+            statusBox.style.border = '1px solid rgba(16, 185, 129, 0.4)';
+            statusBox.style.color = '#6EE7B7';
+            statusBox.innerHTML = `✔ ¡Se han agregado ${res.data.length} planes y productos detectados para <strong>${name}</strong>! Revisa y pulsa "Actualizar Proveedor" para guardar.`;
+        })
+        .catch(err => {
+            btn.disabled = false;
+            btnText.innerText = '✨ Autocompletar Planes con IA';
+            statusBox.style.background = 'rgba(244, 63, 94, 0.12)';
+            statusBox.style.border = '1px solid rgba(244, 63, 94, 0.3)';
+            statusBox.style.color = '#FECDD3';
+            statusBox.innerHTML = '❌ Error al conectar con el asistente de IA.';
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.initialProducts && window.initialProducts.length > 0) {
+            window.initialProducts.forEach(prod => renderProductRow(prod));
+        } else {
+            const basePlan = document.getElementById('field-plan')?.value || '';
+            const basePrice = document.getElementById('field-price-from')?.value || '';
+            const baseBefore = document.getElementById('field-price-before')?.value || '';
+            if (basePlan || basePrice) {
+                renderProductRow({
+                    plan_name: basePlan,
+                    price_from: basePrice,
+                    price_before: baseBefore,
+                    is_featured: true,
+                });
+            }
+        }
+        renumberProducts();
+    });
+</script>
+@endpush
 @endsection

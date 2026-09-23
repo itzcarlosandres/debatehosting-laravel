@@ -1,8 +1,13 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminBadgeController;
+use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminCouponController;
 use App\Http\Controllers\Admin\AdminProviderController;
+use App\Http\Controllers\Admin\AdminReviewController;
+use App\Http\Controllers\Admin\AdminSectionsController;
 use App\Http\Controllers\Admin\AdminSettingsController;
+use App\Http\Controllers\Admin\AiGeneratorController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\AuditorController;
@@ -11,6 +16,8 @@ use App\Http\Controllers\CouponController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProviderController;
 use App\Http\Controllers\RedirectController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SubscriberController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,9 +27,15 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/proveedores', [ProviderController::class, 'index'])->name('providers.index');
 Route::get('/proveedores/{slug}', [ProviderController::class, 'show'])->name('providers.show');
+
+// Reseñas y Análisis Editoriales
+Route::get('/resenas', [ReviewController::class, 'index'])->name('reviews.index');
+Route::get('/resenas/{slug}', [ReviewController::class, 'show'])->name('reviews.show');
 
 Route::get('/cupones', [CouponController::class, 'index'])->name('coupons.index');
 Route::get('/ofertas', [HomeController::class, 'ofertas'])->name('ofertas');
@@ -50,6 +63,23 @@ Route::view('/terminos', 'pages.legal.terminos')->name('terminos');
 |--------------------------------------------------------------------------
 */
 
+Route::get('/login', fn () => redirect()->route('admin.login'))->name('login');
+
+// Acceso al Login (alias global)
+Route::redirect('/login', '/admin/login')->name('login');
+
+Route::get('/login', fn () => redirect()->route('admin.login'))->name('login');
+
+// Acceso al Login (alias global)
+Route::redirect('/login', '/admin/login')->name('login');
+
+Route::get('/login', fn () => redirect()->route('admin.login'))->name('login');
+
+// Acceso al Login (alias global)
+Route::redirect('/login', '/admin/login')->name('login');
+
+Route::get('/login', fn () => redirect()->route('admin.login'))->name('login');
+
 Route::prefix('admin')->name('admin.')->group(function () {
     // Autenticación
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -63,11 +93,49 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // CRUD Proveedores
         Route::resource('providers', AdminProviderController::class);
 
+        // CRUD Reseñas y Análisis Editoriales
+        Route::resource('reviews', AdminReviewController::class);
+        Route::post('reviews/{review}/toggle-publish', [AdminReviewController::class, 'togglePublish'])->name('reviews.toggle-publish');
+
+        // CRUD Categorías
+        Route::resource('categories', AdminCategoryController::class);
+
+        // CRUD Badges / Distintivos
+        Route::resource('badges', AdminBadgeController::class);
+
         // CRUD Cupones
         Route::resource('coupons', AdminCouponController::class);
+
+        // Portada & Secciones (Edición de Textos del Home)
+        Route::get('/sections', [AdminSectionsController::class, 'index'])->name('sections.index');
+        Route::post('/sections', [AdminSectionsController::class, 'update'])->name('sections.update');
+
+        // Portada & Secciones (Edición de Textos del Home)
+        Route::get('/sections', [AdminSectionsController::class, 'index'])->name('sections.index');
+        Route::post('/sections', [AdminSectionsController::class, 'update'])->name('sections.update');
+
+        // Portada & Secciones (Edición de Textos del Home)
+        Route::get('/sections', [AdminSectionsController::class, 'index'])->name('sections.index');
+        Route::post('/sections', [AdminSectionsController::class, 'update'])->name('sections.update');
 
         // Configuraciones de Portada y Sitio
         Route::get('/settings', [AdminSettingsController::class, 'index'])->name('settings');
         Route::post('/settings', [AdminSettingsController::class, 'update'])->name('settings.update');
+        Route::post('/settings/clear-cache', [AdminSettingsController::class, 'clearCache'])->name('settings.clear-cache');
+        Route::post('/settings/reset-stats', [AdminSettingsController::class, 'resetStats'])->name('settings.reset-stats');
+
+        Route::post('/settings/clear-cache', [AdminSettingsController::class, 'clearCache'])->name('settings.clear-cache');
+        Route::post('/settings/reset-stats', [AdminSettingsController::class, 'resetStats'])->name('settings.reset-stats');
+
+        Route::post('/settings/clear-cache', [AdminSettingsController::class, 'clearCache'])->name('settings.clear-cache');
+        Route::post('/settings/reset-stats', [AdminSettingsController::class, 'resetStats'])->name('settings.reset-stats');
+
+        // Asistente IA para Generación de Proveedores y Reseñas
+        Route::post('/ai/generate-provider', [AiGeneratorController::class, 'generateProvider'])->name('ai.generate-provider');
+        Route::post('/ai/generate-review', [AiGeneratorController::class, 'generateReview'])->name('ai.generate-review');
+        Route::post('/ai/test-gemini', [AiGeneratorController::class, 'testGemini'])->name('ai.test-gemini');
+        Route::post('/ai/generate-products', [AiGeneratorController::class, 'generateProducts'])->name('ai.generate-products');
+        Route::post('/ai/generate-products', [AiGeneratorController::class, 'generateProducts'])->name('ai.generate-products');
+        Route::post('/ai/generate-products', [AiGeneratorController::class, 'generateProducts'])->name('ai.generate-products');
     });
 });

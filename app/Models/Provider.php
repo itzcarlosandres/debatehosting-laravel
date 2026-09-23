@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 
 class Provider extends Model
@@ -66,12 +67,48 @@ class Provider extends Model
         return $this->hasMany(ClickEvent::class);
     }
 
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function latestReview(): HasOne
+    {
+        return $this->hasOne(Review::class)->latestOfMany();
+    }
+
+    public function products(): HasMany
+    {
+        return $this->hasMany(ProviderProduct::class)->orderBy('order')->orderBy('price_from');
+    }
+
+    public function featuredProducts(): HasMany
+    {
+        return $this->hasMany(ProviderProduct::class)->where('is_featured', true)->orderBy('order');
+    }
+
+    /**
+     * Obtener el producto correspondiente a una categoría dada, o el primero/destacado por defecto
+     */
+    public function getProductForCategory(?string $categorySlug = null): ?ProviderProduct
+    {
+        if ($categorySlug) {
+            $product = $this->products->firstWhere('category_slug', $categorySlug);
+            if ($product) {
+                return $product;
+            }
+        }
+
+        return $this->products->firstWhere('is_featured', true) ?: $this->products->first();
+    }
+
     /**
      * Score global promedio (sobre 10)
      */
     public function getOverallScoreAttribute(): float
     {
         $avg = ($this->score_precio + $this->score_rendimiento + $this->score_soporte + $this->score_facilidad) / 4;
+
         return round($avg, 1);
     }
 
@@ -96,10 +133,11 @@ class Provider extends Model
 
         if (Str::startsWith($this->logo_url, '/uploads/logos/')) {
             $filename = basename($this->logo_url);
-            return asset('storage/logos/' . $filename);
+
+            return asset('storage/logos/'.$filename);
         }
 
-        return asset('storage/' . ltrim($this->logo_url, '/'));
+        return asset('storage/'.ltrim($this->logo_url, '/'));
     }
 
     /**
@@ -110,6 +148,7 @@ class Provider extends Model
         if ($this->price_before > $this->price_from && $this->price_before > 0) {
             return (int) round((($this->price_before - $this->price_from) / $this->price_before) * 100);
         }
+
         return 0;
     }
 }

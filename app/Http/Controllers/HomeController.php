@@ -14,7 +14,7 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $providers = Provider::where('active', true)->orderBy('score_precio', 'desc')->get();
+        $providers = Provider::where('active', true)->with('coupons')->latest()->get();
         $categories = Category::orderBy('order')->get();
         $picks = Pick::with('provider')->orderBy('position')->get();
         $coupons = Coupon::with('provider')->where('verified', true)->get();
@@ -49,11 +49,16 @@ class HomeController extends Controller
 
     public function ofertas(Request $request)
     {
-        $query = Provider::where('active', true);
+        $query = Provider::where('active', true)->with('products');
 
         if ($request->filled('categoria') && $request->categoria !== 'todas') {
             $cat = $request->categoria;
-            $query->whereJsonContains('categories', $cat);
+            $query->where(function ($q) use ($cat) {
+                $q->whereJsonContains('categories', $cat)
+                    ->orWhereHas('products', function ($pq) use ($cat) {
+                        $pq->where('category_slug', $cat);
+                    });
+            });
         }
 
         $providers = $query->orderBy('price_from', 'asc')->get();

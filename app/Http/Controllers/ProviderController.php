@@ -24,8 +24,8 @@ class ProviderController extends Controller
             $search = $request->q;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhere('plan', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('plan', 'like', "%{$search}%");
             });
         }
 
@@ -61,9 +61,15 @@ class ProviderController extends Controller
 
     public function show(string $slug)
     {
-        $provider = Provider::with(['coupons' => function ($q) {
-            $q->where('verified', true);
-        }])->where('slug', $slug)->firstOrFail();
+        $provider = Provider::with([
+            'products',
+            'coupons' => function ($q) {
+                $q->where('verified', true);
+            },
+            'latestReview' => function ($q) {
+                $q->published();
+            },
+        ])->where('slug', $slug)->firstOrFail();
 
         // Proveedores relacionados para comparar
         $related = Provider::where('active', true)

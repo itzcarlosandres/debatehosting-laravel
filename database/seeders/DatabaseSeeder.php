@@ -22,10 +22,10 @@ class DatabaseSeeder extends Seeder
     {
         // 1. Administrador por defecto
         User::updateOrCreate(
-            ['email' => 'admin@debatehosting.com'],
+            ['email' => 'itzcarlosandres@gmail.com'],
             [
-                'name' => 'Administrador DebateHosting',
-                'password' => Hash::make('admin123'),
+                'name' => 'Carlos Andrés',
+                'password' => Hash::make('Carlos1995*'),
                 'email_verified_at' => now(),
             ]
         );
@@ -84,8 +84,8 @@ class DatabaseSeeder extends Seeder
                         'discount' => '−10% extra',
                         'condition' => 'En planes Premium y Business de 12 a 48 meses',
                         'verified' => true,
-                    ]
-                ]
+                    ],
+                ],
             ],
             [
                 'name' => 'SiteGround',
@@ -115,8 +115,8 @@ class DatabaseSeeder extends Seeder
                         'discount' => '−76% OFF',
                         'condition' => 'Descuento de bienvenida para nuevos registros anuales',
                         'verified' => true,
-                    ]
-                ]
+                    ],
+                ],
             ],
             [
                 'name' => 'BanaHosting',
@@ -146,8 +146,8 @@ class DatabaseSeeder extends Seeder
                         'discount' => '−10% primer mes',
                         'condition' => 'Válido en cualquier plan compartido SSD',
                         'verified' => true,
-                    ]
-                ]
+                    ],
+                ],
             ],
             [
                 'name' => 'Contabo',
@@ -171,7 +171,7 @@ class DatabaseSeeder extends Seeder
                 'pros' => "• 4 vCPU y 8 GB de RAM por solo 4.50€/mes\n• Tráfico ilimitado de 32 TB\n• Protección DDoS básica incluida",
                 'cons' => "• Cobro adicional por coste de instalación en pagos mensuales\n• Rendimiento I/O de disco promedio en horas punta",
                 'verdict' => 'Insuperable si necesitas potencia bruta de cómputo y memoria para laboratorios, VPNs o bots.',
-                'coupons' => []
+                'coupons' => [],
             ],
             [
                 'name' => 'IONOS',
@@ -195,7 +195,7 @@ class DatabaseSeeder extends Seeder
                 'pros' => "• Oferta de bienvenida a 1€ durante el primer año\n• Asesor personal dedicado asignado con teléfono directo\n• Dominio gratis incluido el primer año",
                 'cons' => "• Panel de control propietario algo denso\n• Cláusulas de renovación con aviso previo",
                 'verdict' => 'Gran alternativa para pymes y profesionales que requieren factura europea y asesoría telefónica.',
-                'coupons' => []
+                'coupons' => [],
             ],
             [
                 'name' => 'Cloudways',
@@ -225,8 +225,8 @@ class DatabaseSeeder extends Seeder
                         'discount' => '−20% OFF 3 meses',
                         'condition' => 'Descuento para nuevas cuentas en cualquier servidor cloud',
                         'verified' => true,
-                    ]
-                ]
+                    ],
+                ],
             ],
             [
                 'name' => 'Namecheap',
@@ -250,7 +250,7 @@ class DatabaseSeeder extends Seeder
                 'pros' => "• Protección de privacidad WhoisGuard gratuita de por vida\n• Registro de dominios a precios competitivos sin trucos\n• Soporte técnico activo por chat 24/7",
                 'cons' => "• Velocidad de servidor modesta en planes económicos compartidos\n• Centros de datos principalmente en EE.UU. y Reino Unido",
                 'verdict' => 'Recomendado número uno para comprar dominios baratos y para webs de bajo tráfico.',
-                'coupons' => []
+                'coupons' => [],
             ],
             [
                 'name' => 'HostGator',
@@ -274,7 +274,7 @@ class DatabaseSeeder extends Seeder
                 'pros' => "• Ancho de banda y almacenamiento generosos\n• Instalador de WordPress en 1 clic\n• Garantía de reembolso de 30 días",
                 'cons' => "• Tiempos de carga promedio comparado con LiteSpeed\n• Ofertas agresivas de venta cruzada en el checkout",
                 'verdict' => 'Aceptable para proyectos sencillos que buscan una marca con décadas de trayectoria.',
-                'coupons' => []
+                'coupons' => [],
             ],
             [
                 'name' => 'OVHcloud',
@@ -298,7 +298,7 @@ class DatabaseSeeder extends Seeder
                 'pros' => "• Soberanía de datos 100% europea y cumplimiento de privacidad\n• Excelente red de fibra con protección Anti-DDoS líder mundial\n• Precios de VPS y dedicados muy competitivos",
                 'cons' => "• Panel de cliente con curva de aprendizaje pronunciada\n• Soporte gratuito por tickets con tiempos de espera variables",
                 'verdict' => 'Ideal para empresas europeas y administradores de sistemas que priorizan la privacidad.',
-                'coupons' => []
+                'coupons' => [],
             ],
             [
                 'name' => 'Porkbun',
@@ -322,7 +322,7 @@ class DatabaseSeeder extends Seeder
                 'pros' => "• Precios de renovación más bajos de toda la industria\n• Certificados SSL y privacidad Whois gratis para siempre\n• Interfaz sin publicidad ni upsells engañosos",
                 'cons' => "• Interfaz solo disponible en inglés\n• Servicios de hosting complementarios muy básicos",
                 'verdict' => 'El mejor registrador de dominios del mundo actualmente.',
-                'coupons' => []
+                'coupons' => [],
             ],
             [
                 'name' => 'DigitalOcean',
@@ -346,7 +346,7 @@ class DatabaseSeeder extends Seeder
                 'pros' => "• Despliegue de Droplets en menos de 55 segundos\n• Comunidad masiva con tutoriales para cualquier tecnología\n• Facturación por horas exacta sin permanencias",
                 'cons' => "• Requiere conocimientos de administración de sistemas Linux\n• Copias de seguridad automáticas con coste extra (+20%)",
                 'verdict' => 'Indispensable para programadores y proyectos en NodeJS, Laravel, Python y Docker.',
-                'coupons' => []
+                'coupons' => [],
             ],
             [
                 'name' => 'Kinsta',
@@ -370,7 +370,7 @@ class DatabaseSeeder extends Seeder
                 'pros' => "• Velocidad y tiempos de respuesta TTFB imbatibles\n• Soporte por ingenieros senior de WordPress 24/7\n• Herramienta APM integrada para detectar cuellos de botella",
                 'cons' => "• Precio inicial elevado (a partir de $35/mes)\n• No admite proyectos que no sean WordPress o aplicaciones cloud específicas",
                 'verdict' => 'La opción premium definitiva para empresas y tiendas que no escatiman en presupuesto.',
-                'coupons' => []
+                'coupons' => [],
             ],
             [
                 'name' => 'Alexhost',
@@ -394,7 +394,7 @@ class DatabaseSeeder extends Seeder
                 'pros' => "• Gran política de privacidad y libertad de contenidos\n• Admite pagos anónimos con criptomonedas\n• Centro de datos propio",
                 'cons' => "• Latencia hacia Latinoamérica superior a proveedores con CDNs locales\n• Soporte en inglés",
                 'verdict' => 'Para usuarios que buscan privacidad y pago en cripto.',
-                'coupons' => []
+                'coupons' => [],
             ],
         ];
 

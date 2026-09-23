@@ -14,6 +14,7 @@ class AdminProviderController extends Controller
     public function index()
     {
         $providers = Provider::orderBy('name')->get();
+
         return view('admin.providers.index', compact('providers'));
     }
 
@@ -21,6 +22,7 @@ class AdminProviderController extends Controller
     {
         $categories = Category::orderBy('order')->get();
         $badges = Badge::orderBy('order')->get();
+
         return view('admin.providers.create', compact('categories', 'badges'));
     }
 
@@ -43,23 +45,26 @@ class AdminProviderController extends Controller
             'uptime' => 'required|numeric|min:90|max:100',
             'affiliate_url' => 'nullable|string|max:500',
             'badge' => 'nullable|string|max:50',
-            'badge_color' => 'nullable|string|in:green,gold,red,dark',
+            'badge_color' => 'nullable|string|max:50',
             'active' => 'boolean',
             'description' => 'nullable|string',
             'pros' => 'nullable|string',
             'cons' => 'nullable|string',
             'verdict' => 'nullable|string',
+            'meta_title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string|max:500',
         ]);
 
         $validated['slug'] = $validated['slug'] ?: Str::slug($validated['name']);
         $validated['active'] = $request->boolean('active');
+        $validated['categories'] = array_values(array_filter($request->input('categories', [])));
 
         // Subida de imagen nativa y segura en storage/logos
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
-            $filename = 'logo_' . time() . '_' . Str::slug($validated['name']) . '.' . $file->getClientOriginalExtension();
+            $filename = 'logo_'.time().'_'.Str::slug($validated['name']).'.'.$file->getClientOriginalExtension();
             $path = $file->storeAs('logos', $filename, 'public');
-            $validated['logo_url'] = '/storage/' . $path;
+            $validated['logo_url'] = '/storage/'.$path;
         }
 
         Provider::create($validated);
@@ -71,6 +76,7 @@ class AdminProviderController extends Controller
     {
         $categories = Category::orderBy('order')->get();
         $badges = Badge::orderBy('order')->get();
+
         return view('admin.providers.edit', compact('provider', 'categories', 'badges'));
     }
 
@@ -78,7 +84,7 @@ class AdminProviderController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:providers,slug,' . $provider->id,
+            'slug' => 'nullable|string|max:255|unique:providers,slug,'.$provider->id,
             'logo' => 'nullable|image|mimes:png,jpg,jpeg,webp,svg|max:5120',
             'logo_url' => 'nullable|string',
             'categories' => 'nullable|array',
@@ -93,22 +99,25 @@ class AdminProviderController extends Controller
             'uptime' => 'required|numeric|min:90|max:100',
             'affiliate_url' => 'nullable|string|max:500',
             'badge' => 'nullable|string|max:50',
-            'badge_color' => 'nullable|string|in:green,gold,red,dark',
+            'badge_color' => 'nullable|string|max:50',
             'active' => 'boolean',
             'description' => 'nullable|string',
             'pros' => 'nullable|string',
             'cons' => 'nullable|string',
             'verdict' => 'nullable|string',
+            'meta_title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string|max:500',
         ]);
 
         $validated['slug'] = $validated['slug'] ?: Str::slug($validated['name']);
         $validated['active'] = $request->boolean('active');
+        $validated['categories'] = array_values(array_filter($request->input('categories', [])));
 
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
-            $filename = 'logo_' . time() . '_' . Str::slug($validated['name']) . '.' . $file->getClientOriginalExtension();
+            $filename = 'logo_'.time().'_'.Str::slug($validated['name']).'.'.$file->getClientOriginalExtension();
             $path = $file->storeAs('logos', $filename, 'public');
-            $validated['logo_url'] = '/storage/' . $path;
+            $validated['logo_url'] = '/storage/'.$path;
         }
 
         $provider->update($validated);
@@ -119,6 +128,7 @@ class AdminProviderController extends Controller
     public function destroy(Provider $provider)
     {
         $provider->delete();
+
         return redirect()->route('admin.providers.index')->with('success', 'Proveedor eliminado.');
     }
 }

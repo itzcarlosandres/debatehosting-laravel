@@ -1,64 +1,88 @@
 @extends('layouts.admin')
 
-@section('title', 'Editar Cupón ' . $coupon->code . ' — DebateHosting Admin')
+@section('title', 'Editar Cupón ' . $coupon->code)
 
 @section('content')
-<div class="page-header">
+<div class="admin-page-header">
     <div>
-        <h1 style="font-size: 1.8rem; font-weight: 700;">Editar Cupón: {{ $coupon->code }}</h1>
-        <p style="color: var(--text-muted); font-size: 0.9rem;">Modifica los detalles del cupón promocional.</p>
+        <h1 class="page-header-title">Editar Cupón: {{ $coupon->code }}</h1>
+        <p class="page-header-subtitle">Modifica las condiciones o actualiza el estado de verificación del cupón.</p>
     </div>
-    <a href="{{ route('admin.coupons.index') }}" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">← Volver</a>
+    <div class="page-header-actions">
+        <a href="{{ route('admin.coupons.index') }}" class="btn-secondary">
+            <i data-lucide="arrow-left" style="width: 14px; height: 14px;"></i>
+            <span>Volver a Cupones</span>
+        </a>
+    </div>
 </div>
 
 @if($errors->any())
-    <div style="background: #7F1D1D; color: #FECACA; padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem;">
-        <ul style="margin-left: 1.5rem;">
-            @foreach($errors->all() as $err)
-                <li>{{ $err }}</li>
-            @endforeach
-        </ul>
+    <div class="toast-banner error">
+        <div>
+            <div style="font-weight: 700; margin-bottom: 0.25rem;">Por favor corrige los errores antes de continuar:</div>
+            <ul style="margin-left: 1.25rem; font-size: 0.82rem;">
+                @foreach($errors->all() as $err)
+                    <li>{{ $err }}</li>
+                @endforeach
+            </ul>
+        </div>
     </div>
 @endif
 
-<form action="{{ route('admin.coupons.update', $coupon) }}" method="POST" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 2rem; max-width: 650px;">
+<form action="{{ route('admin.coupons.update', $coupon) }}" method="POST" style="max-width: 680px;">
     @csrf
     @method('PUT')
 
-    <div class="form-group">
-        <label class="form-label">Proveedor Asociado *</label>
-        <select name="provider_id" class="form-control" required>
-            @foreach($providers as $p)
-                <option value="{{ $p->id }}" {{ old('provider_id', $coupon->provider_id) == $p->id ? 'selected' : '' }}>{{ $p->name }}</option>
-            @endforeach
-        </select>
-    </div>
-
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-        <div class="form-group">
-            <label class="form-label">Código del Cupón *</label>
-            <input type="text" name="code" class="form-control" value="{{ old('code', $coupon->code) }}" required style="text-transform: uppercase; font-family: 'IBM Plex Mono', monospace;">
+    <div class="form-panel">
+        <div class="form-panel-header">
+            <div class="form-panel-title">
+                <i data-lucide="ticket" style="width: 18px; height: 18px; color: var(--sky-primary);"></i>
+                <span>Datos del Cupón</span>
+            </div>
+            <p class="form-panel-desc">Proveedor vinculado y términos de la promoción.</p>
         </div>
 
         <div class="form-group">
-            <label class="form-label">Texto del Descuento *</label>
-            <input type="text" name="discount" class="form-control" value="{{ old('discount', $coupon->discount) }}" required>
+            <label class="form-label">Proveedor Asociado *</label>
+            <select name="provider_id" class="form-control" required>
+                @foreach($providers as $p)
+                    <option value="{{ $p->id }}" {{ old('provider_id', $coupon->provider_id) == $p->id ? 'selected' : '' }}>{{ $p->name }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+            <div class="form-group">
+                <label class="form-label">Código del Cupón *</label>
+                <input type="text" name="code" class="form-control" value="{{ old('code', $coupon->code) }}" required style="text-transform: uppercase; font-family: var(--font-mono); font-weight: 700; color: var(--sky-primary);">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Texto del Descuento *</label>
+                <input type="text" name="discount" class="form-control" value="{{ old('discount', $coupon->discount) }}" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Condición / Términos de Aplicación</label>
+            <input type="text" name="condition" class="form-control" value="{{ old('condition', $coupon->condition) }}">
+        </div>
+
+        <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border-subtle);">
+            <label class="toggle-label-wrap">
+                <input type="checkbox" name="verified" id="verified" value="1" {{ old('verified', $coupon->verified) ? 'checked' : '' }}>
+                <span class="toggle-text">Cupón verificado y activo (mostrado en listados)</span>
+            </label>
         </div>
     </div>
 
-    <div class="form-group">
-        <label class="form-label">Condición / Términos de Aplicación</label>
-        <input type="text" name="condition" class="form-control" value="{{ old('condition', $coupon->condition) }}">
-    </div>
-
-    <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem;">
-        <input type="checkbox" name="verified" id="verified" value="1" {{ old('verified', $coupon->verified) ? 'checked' : '' }}>
-        <label for="verified" class="form-label" style="margin-bottom: 0; cursor: pointer;">Cupón verificado y activo</label>
-    </div>
-
-    <div style="margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem; display: flex; justify-content: flex-end; gap: 1rem;">
-        <a href="{{ route('admin.coupons.index') }}" class="btn-action" style="background: #334155;">Cancelar</a>
-        <button type="submit" class="btn-action">Actualizar Cupón</button>
+    <!-- Barra de Acciones -->
+    <div class="form-actions-bar">
+        <a href="{{ route('admin.coupons.index') }}" class="btn-secondary">Cancelar</a>
+        <button type="submit" class="btn-primary">
+            <i data-lucide="save" style="width: 15px; height: 15px;"></i>
+            <span>Actualizar Cupón</span>
+        </button>
     </div>
 </form>
 @endsection

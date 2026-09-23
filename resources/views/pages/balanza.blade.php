@@ -1,82 +1,115 @@
 @extends('layouts.app')
 
 @section('title', 'La Balanza: Comparador Ponderado de Hosting y Servidores — Debatehosting')
+@section('meta_description', 'La Balanza: Herramienta interactiva para comparar proveedores de hosting según tus prioridades: precio, rendimiento, soporte y facilidad de uso.')
 
 @section('content')
-<section style="background: var(--bg-dark-paper); color: var(--text-dark-ink); padding: 4rem 1.5rem; min-height: 80vh;">
-    <div style="max-width: 1100px; margin: 0 auto;">
+<section style="padding: 3.5rem 0 5rem 0;">
+    <div class="container">
         <!-- Cabecera de La Balanza -->
-        <div style="text-align: center; margin-bottom: 3.5rem;">
-            <span style="font-family: var(--font-mono); font-size: 0.8rem; color: #46C285; letter-spacing: 0.1em; text-transform: uppercase;">
-                ALGORITMO EDITORIAL DE PONDERACIÓN
-            </span>
-            <h1 style="font-family: var(--font-serif); font-size: 2.8rem; margin: 0.5rem 0 1rem 0; color: #FAF7EE;">
-                ⚖️ La Balanza del Hosting
-            </h1>
-            <p style="font-size: 1.1rem; color: var(--text-dark-muted); max-width: 650px; margin: 0 auto;">
-                Ajusta la importancia que le das a cada factor. Nuestro motor recalculará la puntuación exacta de cada proveedor para tu caso específico.
+        <div class="section-headline-wrap" style="margin-bottom: 3rem;">
+            <div class="kicker">ALGORITMO EDITORIAL DE PONDERACIÓN</div>
+            <h1 class="section-title">⚖️ La Balanza del Hosting</h1>
+            <p class="section-subtitle">
+                Ajusta la importancia que le das a cada factor. Nuestro motor recalcula en tiempo real la puntuación técnica exacta para tu caso específico.
             </p>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1.3fr; gap: 3rem; align-items: flex-start;">
+        <!-- Presets Rápidos -->
+        <div style="display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2.5rem;">
+            <span style="font-size: 0.82rem; color: var(--text-dim); display: flex; align-items: center; margin-right: 0.5rem;">Preajustes:</span>
+            <button type="button" onclick="setPreset(90, 60, 40, 70)" class="btn btn-secondary btn-sm" style="border-radius: var(--radius-full);">
+                💰 Máximo Ahorro
+            </button>
+            <button type="button" onclick="setPreset(40, 95, 80, 50)" class="btn btn-secondary btn-sm" style="border-radius: var(--radius-full);">
+                ⚡ Máxima Velocidad TTFB
+            </button>
+            <button type="button" onclick="setPreset(50, 80, 95, 80)" class="btn btn-secondary btn-sm" style="border-radius: var(--radius-full);">
+                🛒 Tienda WooCommerce
+            </button>
+            <button type="button" onclick="setPreset(60, 90, 40, 40)" class="btn btn-secondary btn-sm" style="border-radius: var(--radius-full);">
+                💻 VPS para Desarrollador
+            </button>
+            <button type="button" onclick="setPreset(50, 50, 50, 50)" class="btn btn-secondary btn-sm" style="border-radius: var(--radius-full);">
+                ⚖️ Equilibrado (50%)
+            </button>
+        </div>
+
+        <div class="balanza-controls-grid">
             <!-- Controles / Sliders -->
-            <div style="background: var(--bg-dark-surface); border: 1.5px solid var(--border-dark); border-radius: var(--radius-md); padding: 2rem; box-shadow: 4px 4px 0 rgba(0,0,0,0.5);">
-                <h3 style="font-family: var(--font-serif); font-size: 1.4rem; margin-top: 0; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-dark); padding-bottom: 0.75rem;">
-                    Ajusta tus Prioridades
+            <div style="background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 2rem; box-shadow: var(--shadow-sm);">
+                <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-main); margin-bottom: 1.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 0.5rem;">
+                    <i data-lucide="sliders" style="width: 18px; height: 18px; color: var(--emerald-primary);"></i>
+                    <span>Ajusta tus Pesos y Prioridades</span>
                 </h3>
 
-                <!-- Slider 1: Precio -->
-                <div style="margin-bottom: 1.5rem;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 0.5rem;">
-                        <span>💰 Economía / Presupuesto</span>
-                        <span id="val-precio" style="font-family: var(--font-mono); color: #46C285; font-weight: 700;">50%</span>
+                <div class="slider-group-wrap">
+                    <!-- Slider 1: Precio -->
+                    <div class="balanza-slider-box">
+                        <div class="slider-header-meta">
+                            <span>💰 Economía / Presupuesto</span>
+                            <span id="val-precio" class="slider-val-pill">50%</span>
+                        </div>
+                        <input type="range" id="slider-precio" min="10" max="100" value="50" oninput="recalcBalanza()" class="clean-range-slider">
                     </div>
-                    <input type="range" id="slider-precio" min="10" max="100" value="50" oninput="recalcBalanza()" style="width: 100%; accent-color: #0E6B41;">
-                </div>
 
-                <!-- Slider 2: Rendimiento -->
-                <div style="margin-bottom: 1.5rem;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 0.5rem;">
-                        <span>⚡ Velocidad / Rendimiento</span>
-                        <span id="val-rendimiento" style="font-family: var(--font-mono); color: #46C285; font-weight: 700;">50%</span>
+                    <!-- Slider 2: Rendimiento -->
+                    <div class="balanza-slider-box">
+                        <div class="slider-header-meta">
+                            <span>⚡ Velocidad / Rendimiento TTFB</span>
+                            <span id="val-rendimiento" class="slider-val-pill">50%</span>
+                        </div>
+                        <input type="range" id="slider-rendimiento" min="10" max="100" value="50" oninput="recalcBalanza()" class="clean-range-slider">
                     </div>
-                    <input type="range" id="slider-rendimiento" min="10" max="100" value="50" oninput="recalcBalanza()" style="width: 100%; accent-color: #0E6B41;">
-                </div>
 
-                <!-- Slider 3: Soporte -->
-                <div style="margin-bottom: 1.5rem;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 0.5rem;">
-                        <span>🛠️ Soporte Técnico 24/7</span>
-                        <span id="val-soporte" style="font-family: var(--font-mono); color: #46C285; font-weight: 700;">50%</span>
+                    <!-- Slider 3: Soporte -->
+                    <div class="balanza-slider-box">
+                        <div class="slider-header-meta">
+                            <span>🛠️ Soporte Técnico 24/7</span>
+                            <span id="val-soporte" class="slider-val-pill">50%</span>
+                        </div>
+                        <input type="range" id="slider-soporte" min="10" max="100" value="50" oninput="recalcBalanza()" class="clean-range-slider">
                     </div>
-                    <input type="range" id="slider-soporte" min="10" max="100" value="50" oninput="recalcBalanza()" style="width: 100%; accent-color: #0E6B41;">
-                </div>
 
-                <!-- Slider 4: Facilidad -->
-                <div style="margin-bottom: 1.5rem;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 0.5rem;">
-                        <span>🧩 Facilidad de Uso (Panel)</span>
-                        <span id="val-facilidad" style="font-family: var(--font-mono); color: #46C285; font-weight: 700;">50%</span>
+                    <!-- Slider 4: Facilidad -->
+                    <div class="balanza-slider-box">
+                        <div class="slider-header-meta">
+                            <span>🧩 Facilidad de Uso (Panel cPanel/hPanel)</span>
+                            <span id="val-facilidad" class="slider-val-pill">50%</span>
+                        </div>
+                        <input type="range" id="slider-facilidad" min="10" max="100" value="50" oninput="recalcBalanza()" class="clean-range-slider">
                     </div>
-                    <input type="range" id="slider-facilidad" min="10" max="100" value="50" oninput="recalcBalanza()" style="width: 100%; accent-color: #0E6B41;">
                 </div>
             </div>
 
             <!-- Resultados en Tiempo Real -->
             <div>
-                <h3 style="font-family: var(--font-serif); font-size: 1.4rem; margin-top: 0; margin-bottom: 1rem; color: #FAF7EE;">
-                    Ranking Recomendado según tus Pesos:
-                </h3>
-                <div id="balanza-results" style="display: flex; flex-direction: column; gap: 1rem;">
-                    <!-- Se inyecta con JS -->
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+                    <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-main); margin: 0;">
+                        Ranking Ponderado Resultante
+                    </h3>
+                    <span class="badge-pill badge-emerald">En Vivo</span>
+                </div>
+
+                <div id="balanza-results" class="balanza-results-container">
+                    <!-- Se inyecta con JavaScript -->
                 </div>
             </div>
         </div>
     </div>
 </section>
 
+@push('scripts')
 <script>
     const providersData = @json($providers);
+
+    function setPreset(p, r, s, f) {
+        document.getElementById('slider-precio').value = p;
+        document.getElementById('slider-rendimiento').value = r;
+        document.getElementById('slider-soporte').value = s;
+        document.getElementById('slider-facilidad').value = f;
+        recalcBalanza();
+    }
 
     function recalcBalanza() {
         const wPrecio = parseInt(document.getElementById('slider-precio').value);
@@ -101,7 +134,7 @@
 
             return {
                 ...p,
-                customScore: finalScore.toFixed(2)
+                customScore: finalScore.toFixed(1)
             };
         }).sort((a, b) => b.customScore - a.customScore);
 
@@ -112,39 +145,53 @@
         const container = document.getElementById('balanza-results');
         container.innerHTML = '';
 
-        list.slice(0, 5).forEach((item, idx) => {
+        list.slice(0, 6).forEach((item, idx) => {
             const card = document.createElement('div');
-            card.style.background = idx === 0 ? '#1F2A1E' : '#1B1813';
-            card.style.border = idx === 0 ? '2px solid #46C285' : '1px solid #322D24';
-            card.style.borderRadius = '6px';
-            card.style.padding = '1.25rem';
-            card.style.display = 'flex';
-            card.style.justifyContent = 'space-between';
-            card.style.alignItems = 'center';
+            card.className = 'balanza-result-row';
+
+            const logoHtml = item.resolved_logo_url
+                ? `<img src="${item.resolved_logo_url}" alt="${item.name}" style="width: 48px; height: 48px; object-fit: contain; background: #fff; padding: 4px; border-radius: 10px; border: 1px solid var(--border-color); box-shadow: var(--shadow-xs);">`
+                : `<div style="width: 48px; height: 48px; border-radius: 10px; background: var(--bg-subtle); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; color: var(--text-main);">${item.name.substring(0,2)}</div>`;
 
             card.innerHTML = `
                 <div style="display: flex; align-items: center; gap: 1rem;">
-                    <span style="font-family: var(--font-mono); font-size: 1.2rem; font-weight: 700; color: ${idx === 0 ? '#46C285' : '#9E9687'};">#${idx + 1}</span>
+                    <span class="result-rank-num ${idx === 0 ? 'first' : ''}">#${idx + 1}</span>
+                    ${logoHtml}
                     <div>
-                        <div style="font-weight: 700; font-size: 1.1rem; color: #FAF7EE;">${item.name}</div>
-                        <div style="font-size: 0.8rem; color: #9E9687;">${item.plan} — $${item.price_from}/mes</div>
+                        <div style="font-weight: 800; font-size: 1.05rem; color: var(--text-main);">
+                            ${item.name}
+                            ${idx === 0 ? '<span class="badge-pill badge-emerald" style="margin-left: 0.4rem; font-size: 0.65rem;">TOP RECOMENDADO</span>' : ''}
+                        </div>
+                        <div style="font-size: 0.78rem; color: var(--text-muted); font-family: var(--font-mono);">${item.plan} • $${parseFloat(item.price_from).toFixed(2)}/mes</div>
                     </div>
                 </div>
-                <div style="text-align: right; display: flex; align-items: center; gap: 1.5rem;">
-                    <div>
-                        <span style="font-size: 0.75rem; color: #9E9687;">Ajuste</span>
-                        <div style="font-family: var(--font-mono); font-size: 1.3rem; font-weight: 800; color: ${idx === 0 ? '#46C285' : '#FAF7EE'};">${item.customScore}</div>
+
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div style="text-align: right;">
+                        <span style="font-family: var(--font-mono); font-size: 1.35rem; font-weight: 800; color: ${idx === 0 ? 'var(--emerald-primary)' : 'var(--text-main)'};">
+                            ${item.customScore}
+                        </span>
+                        <span style="font-size: 0.68rem; color: var(--text-dim); display: block;">Nota Ajustada</span>
                     </div>
-                    <a href="/go/${item.slug}" target="_blank" class="btn-primary-editorial" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">
-                        Ver ↗
-                    </a>
+                    <div style="display: flex; gap: 0.35rem;">
+                        <a href="{{ url('/proveedores') }}/${item.slug}" class="btn btn-secondary btn-sm" style="padding: 0.4rem 0.7rem;">
+                            <span>Ficha</span>
+                        </a>
+                        <a href="{{ url('/go') }}/${item.slug}" target="_blank" class="btn btn-primary btn-sm" style="padding: 0.4rem 0.8rem;">
+                            <span>Oferta ↗</span>
+                        </a>
+                    </div>
                 </div>
             `;
             container.appendChild(card);
         });
+
+        if (window.lucide) lucide.createIcons();
     }
 
-    // Inicializar al cargar
-    document.addEventListener('DOMContentLoaded', recalcBalanza);
+    document.addEventListener('DOMContentLoaded', () => {
+        recalcBalanza();
+    });
 </script>
+@endpush
 @endsection

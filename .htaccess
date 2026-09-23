@@ -1,0 +1,25 @@
+# =========================================================================
+# DebateHosting - Protección y Enrutamiento para Servidores Apache / aaPanel
+# =========================================================================
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Bloquear acceso directo a archivos confidenciales del núcleo
+    RewriteRule ^(\.env|\.git|composer\.(json|lock)|package\.(json|lock)|artisan|storage/logs) - [F,L,NC]
+
+    # Si la petición no entra por /public/, enrutarla automáticamente a /public/
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+# Denegar acceso directo a archivos que comiencen por punto
+<FilesMatch "^\.">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>

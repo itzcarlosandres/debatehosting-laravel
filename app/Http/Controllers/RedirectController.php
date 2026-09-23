@@ -24,8 +24,12 @@ class RedirectController extends Controller
             'user_agent' => $request->userAgent(),
         ]);
 
-        $destination = $provider->affiliate_url ?: 'https://' . $provider->slug . '.com';
-        return redirect()->away($destination);
+        $destination = $provider->affiliate_url ?: 'https://'.$provider->slug.'.com';
+
+        return redirect()->away($destination, 302, [
+            'X-Robots-Tag' => 'noindex, nofollow',
+            'Cache-Control' => 'no-cache, no-store, must-revalidate',
+        ]);
     }
 
     public function trackCoupon(Request $request)
