@@ -45,7 +45,7 @@
     </div>
 
     <div style="text-align: center; margin-top: 2rem;">
-        <a href="{{ route('legal.metodo') }}" class="btn btn-secondary" style="padding: 0.75rem 1.5rem; font-weight: 600;">
+        <a href="{{ route('metodo') }}" class="btn btn-secondary" style="padding: 0.75rem 1.5rem; font-weight: 600;">
             Leer Metodología de Pruebas &rarr;
         </a>
     </div>

@@ -63,27 +63,7 @@ Route::view('/terminos', 'pages.legal.terminos')->name('terminos');
 |--------------------------------------------------------------------------
 */
 
-Route::get('/login', fn () => redirect()->route('admin.login'))->name('login');
-
-// Acceso al Login (alias global)
 Route::redirect('/login', '/admin/login')->name('login');
-
-Route::get('/login', fn () => redirect()->route('admin.login'))->name('login');
-
-// Acceso al Login (alias global)
-Route::redirect('/login', '/admin/login')->name('login');
-
-Route::get('/login', fn () => redirect()->route('admin.login'))->name('login');
-
-// Acceso al Login (alias global)
-Route::redirect('/login', '/admin/login')->name('login');
-
-Route::get('/login', fn () => redirect()->route('admin.login'))->name('login');
-
-// Acceso al Login (alias global)
-Route::redirect('/login', '/admin/login')->name('login');
-
-Route::get('/login', fn () => redirect()->route('admin.login'))->name('login');
 
 Route::prefix('admin')->name('admin.')->group(function () {
     // Autenticación
