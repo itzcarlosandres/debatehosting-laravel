@@ -192,11 +192,6 @@
 
             <!-- Acciones y Móvil -->
             <div style="display: flex; align-items: center; gap: 0.75rem;">
-                <a href="{{ route('ofertas') }}" class="btn btn-emerald btn-sm header-cta-btn">
-                    <span>Ver Ofertas</span>
-                    <i data-lucide="sparkles" style="width: 13px; height: 13px;"></i>
-                </a>
-
                 <!-- Botón Hamburguesa Móvil -->
                 <button class="mobile-menu-btn" onclick="toggleMobileNav()" aria-label="Abrir menú de navegación">
                     <i data-lucide="menu" style="width: 20px; height: 20px;"></i>
