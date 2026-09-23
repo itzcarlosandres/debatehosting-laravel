@@ -37,6 +37,7 @@
                     </div>
 
                     <select name="orden" onchange="this.form.submit()" style="background-color: var(--bg-subtle); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.5rem 0.75rem; font-size: 0.85rem; outline: none;">
+                        <option value="recientes" {{ request('orden', 'recientes') == 'recientes' ? 'selected' : '' }}>Más Recientes</option>
                         <option value="recomendados" {{ request('orden') == 'recomendados' ? 'selected' : '' }}>Recomendados</option>
                         <option value="precio_asc" {{ request('orden') == 'precio_asc' ? 'selected' : '' }}>Precio: Menor a Mayor</option>
                         <option value="precio_desc" {{ request('orden') == 'precio_desc' ? 'selected' : '' }}>Precio: Mayor a Menor</option>

@@ -29,9 +29,15 @@ class ProviderController extends Controller
             });
         }
 
-        // Ordenamiento
-        $sort = $request->get('orden', 'recomendados');
+        // Ordenamiento (por defecto: más recientes primero)
+        $sort = $request->get('orden', 'recientes');
         switch ($sort) {
+            case 'recientes':
+                $query->orderBy('created_at', 'desc')->orderBy('id', 'desc');
+                break;
+            case 'recomendados':
+                $query->orderBy('score_precio', 'desc');
+                break;
             case 'precio_asc':
                 $query->orderBy('price_from', 'asc');
                 break;
@@ -48,7 +54,7 @@ class ProviderController extends Controller
                 $query->orderBy('name', 'asc');
                 break;
             default:
-                $query->orderBy('score_precio', 'desc');
+                $query->orderBy('created_at', 'desc')->orderBy('id', 'desc');
                 break;
         }
 
