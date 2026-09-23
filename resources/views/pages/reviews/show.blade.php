@@ -244,27 +244,34 @@
         margin: 0;
     }
 
-    /* Contenedor Unificado del Artículo */
+    /* Un solo contenedor continuo para todo el texto del artículo */
     .review-article-body {
-        display: flex;
-        flex-direction: column;
-        gap: 1.75rem;
+        background: var(--bg-surface, #FFFFFF);
+        border: 1px solid var(--border-color, #E2E8F0);
+        border-radius: var(--radius-lg, 16px);
+        padding: 2.5rem 2.75rem;
+        box-shadow: 0 3px 14px rgba(15, 23, 42, 0.04);
         margin-bottom: 3.5rem;
     }
 
-    /* Tarjeta individual de cada bloque de análisis técnico */
+    /* Cada bloque dentro del mismo contenedor unificado */
     .editorial-card-section {
-        background: var(--bg-surface, #FFFFFF);
-        border: 1px solid var(--border-color, #E2E8F0);
-        border-radius: var(--radius-lg, 14px);
-        padding: 2rem 2.25rem;
-        box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
-        transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-        position: relative;
+        background: transparent;
+        border: none;
+        border-radius: 0;
+        padding: 0;
+        box-shadow: none;
     }
     .editorial-card-section:hover {
-        border-color: rgba(16, 185, 129, 0.35);
-        box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
+        border-color: transparent;
+        box-shadow: none;
+    }
+
+    /* Divisor sutil y elegante entre bloques dentro de la tarjeta única */
+    .editorial-card-section + .editorial-card-section {
+        margin-top: 2.25rem;
+        padding-top: 2.25rem;
+        border-top: 1px solid var(--border-subtle, #F1F5F9);
     }
 
     /* Cabecera del bloque: número de sección alineado con el título */
@@ -272,9 +279,9 @@
         display: flex;
         align-items: center;
         gap: 0.85rem;
-        margin-bottom: 1.25rem;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid var(--border-subtle, #F1F5F9);
+        margin-bottom: 1.15rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px dashed var(--border-subtle, #F1F5F9);
     }
 
     /* Píldora con número de auditoría (01, 02, etc.) sin la palabra 'SECCIÓN' */
@@ -360,8 +367,13 @@
     }
 
     @media (max-width: 640px) {
-        .editorial-card-section {
-            padding: 1.35rem 1.15rem;
+        .review-article-body {
+            padding: 1.5rem 1.25rem;
+            border-radius: 12px;
+        }
+        .editorial-card-section + .editorial-card-section {
+            margin-top: 1.75rem;
+            padding-top: 1.75rem;
         }
         .editorial-card-header {
             flex-direction: column;
