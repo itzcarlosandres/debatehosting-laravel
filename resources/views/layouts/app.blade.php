@@ -232,28 +232,6 @@
     <!-- Footer Corporativo y Observatorio Técnico -->
     <footer class="site-clean-footer">
         <div class="container">
-            <!-- Banner Benchmark: La Balanza de Prioridades -->
-            <div class="footer-balanza-cta">
-                <div class="footer-balanza-content">
-                    <div class="footer-balanza-icon">
-                        <i data-lucide="scale" style="width: 26px; height: 26px; color: var(--emerald-primary);"></i>
-                    </div>
-                    <div>
-                        <div class="footer-balanza-badge">BENCHMARK INTERACTIVO</div>
-                        <h3 class="footer-balanza-title">La Balanza: Calibra tus Prioridades</h3>
-                        <p class="footer-balanza-desc">
-                            Pondera en tiempo real precio, velocidad TTFB, soporte y panel para calcular con rigor matemático cuál es el proveedor óptimo para tu proyecto.
-                        </p>
-                    </div>
-                </div>
-                <div class="footer-balanza-actions">
-                    <a href="{{ route('balanza') }}" class="btn-footer-balanza">
-                        <span>Ponderar Hosting</span>
-                        <i data-lucide="arrow-right" style="width: 15px; height: 15px;"></i>
-                    </a>
-                </div>
-            </div>
-
             <div class="footer-grid-4col">
                 <!-- Columna 1: Marca & Misión Editorial -->
                 <div class="footer-col-brand">
