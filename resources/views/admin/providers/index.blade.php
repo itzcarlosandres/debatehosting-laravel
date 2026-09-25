@@ -36,7 +36,6 @@
                     <th>Plan Base</th>
                     <th>Precio Entrada</th>
                     <th>Score Global</th>
-                    <th>Métricas (P/R/S)</th>
                     <th>Clics</th>
                     <th>Estado</th>
                     <th style="text-align: right;">Acciones</th>
@@ -83,15 +82,6 @@
                         </span>
                     </td>
                     <td>
-                        <div style="display: flex; gap: 0.35rem; font-family: var(--font-mono); font-size: 0.72rem;">
-                            <span title="Precio" style="color: var(--text-muted);">P:{{ $p->score_precio }}</span>
-                            <span style="color: var(--border-medium);">|</span>
-                            <span title="Rendimiento" style="color: var(--text-muted);">R:{{ $p->score_rendimiento }}</span>
-                            <span style="color: var(--border-medium);">|</span>
-                            <span title="Soporte" style="color: var(--text-muted);">S:{{ $p->score_soporte }}</span>
-                        </div>
-                    </td>
-                    <td>
                         <span style="font-family: var(--font-mono); font-size: 0.82rem; font-weight: 600; color: var(--text-muted);">
                             {{ number_format($p->clicks) }}
                         </span>
@@ -127,7 +117,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="8" style="text-align: center; color: var(--text-dim); padding: 3rem;">
+                    <td colspan="7" style="text-align: center; color: var(--text-dim); padding: 3rem;">
                         No se encontraron proveedores registrados.
                     </td>
                 </tr>

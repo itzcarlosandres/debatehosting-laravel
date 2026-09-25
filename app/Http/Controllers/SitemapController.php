@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Provider;
+use App\Models\Review;
 use Illuminate\Http\Response;
 
 class SitemapController extends Controller
@@ -19,7 +20,7 @@ class SitemapController extends Controller
 
         $categories = Category::orderBy('order')->get();
 
-        $reviews = \App\Models\Review::where('published', true)
+        $reviews = Review::where('published', true)
             ->orderBy('updated_at', 'desc')
             ->get();
 

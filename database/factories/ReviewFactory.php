@@ -16,12 +16,12 @@ class ReviewFactory extends Factory
 
     public function definition(): array
     {
-        $title = 'Reseña Completa de ' . fake()->company();
+        $title = 'Reseña Completa de '.fake()->company();
 
         return [
             'provider_id' => Provider::factory(),
             'title' => $title,
-            'slug' => Str::slug($title) . '-' . fake()->unique()->numberBetween(100, 999),
+            'slug' => Str::slug($title).'-'.fake()->unique()->numberBetween(100, 999),
             'provider_name' => null,
             'target_category' => 'hosting-web',
             'rating' => 9.4,

@@ -26,7 +26,7 @@ class AiGeneratorController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Ocurrió un error al generar la información con IA: ' . $e->getMessage(),
+                'message' => 'Ocurrió un error al generar la información con IA: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -53,7 +53,7 @@ class AiGeneratorController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Ocurrió un error al redactar la reseña con IA: ' . $e->getMessage(),
+                'message' => 'Ocurrió un error al redactar la reseña con IA: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -84,7 +84,7 @@ class AiGeneratorController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Ocurrió un error al generar los productos con IA: ' . $e->getMessage(),
+                'message' => 'Ocurrió un error al generar los productos con IA: '.$e->getMessage(),
             ], 500);
         }
     }

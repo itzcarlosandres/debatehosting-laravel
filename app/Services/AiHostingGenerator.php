@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Setting;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
@@ -67,7 +68,6 @@ class AiHostingGenerator
         return $this->generateReviewHeuristic($name, $focus, $providerData);
     }
 
-
     /**
      * Llamada a la API de Gemini (Google AI)
      */
@@ -79,21 +79,21 @@ class AiHostingGenerator
                 'contents' => [
                     [
                         'parts' => [
-                            ['text' => $prompt]
-                        ]
-                    ]
+                            ['text' => $prompt],
+                        ],
+                    ],
                 ],
                 'generationConfig' => [
                     'responseMimeType' => 'application/json',
                     'temperature' => 0.4,
-                ]
+                ],
             ]);
 
             if ($response->successful()) {
                 $content = $response->json('candidates.0.content.parts.0.text');
                 if ($content) {
                     $data = json_decode($content, true);
-                    if (is_array($data) && !empty($data['plan'])) {
+                    if (is_array($data) && ! empty($data['plan'])) {
                         return $this->sanitizeData($name, $data);
                     }
                 }
@@ -126,7 +126,7 @@ class AiHostingGenerator
                 $content = $response->json('choices.0.message.content');
                 if ($content) {
                     $data = json_decode($content, true);
-                    if (is_array($data) && !empty($data['plan'])) {
+                    if (is_array($data) && ! empty($data['plan'])) {
                         return $this->sanitizeData($name, $data);
                     }
                 }
@@ -143,7 +143,7 @@ class AiHostingGenerator
      */
     protected function buildPrompt(string $name, string $focus): string
     {
-        $focusText = $focus ? "Enfoque / Especialidad declarada: {$focus}." : "";
+        $focusText = $focus ? "Enfoque / Especialidad declarada: {$focus}." : '';
 
         return <<<PROMPT
 Genera una ficha técnica editorial exhaustiva y objetiva para el proveedor de hosting o servidores web: "{$name}".
@@ -198,8 +198,8 @@ PROMPT;
                 'pros' => "• Despliegue en infraestructura de DigitalOcean, AWS y Google Cloud\n• Pila ThunderStack con Redis y caché Object Cache Pro incluida\n• Entornos de pruebas (staging), clones y backups automáticos en 1 clic\n• Sin permanencias ni contratos anuales obligatorios (pago por horas)",
                 'cons' => "• No incluye servicio de correo electrónico nativo (requiere addon de pago)\n• Curva de configuración ligeramente superior a un cPanel tradicional",
                 'verdict' => 'La opción predilecta para tiendas WooCommerce, agencias y sitios con alto volumen de tráfico que necesitan potencia cloud sin lidiar con sysadmin.',
-                'meta_title' => "Cloudways: Análisis y Opiniones Reales — DebateHosting",
-                'meta_description' => "Auditoría técnica de Cloudways. Evaluamos rendimiento TTFB, servidores en la nube gestionados, pros, contras y precios desde $14/mes."
+                'meta_title' => 'Cloudways: Análisis y Opiniones Reales — DebateHosting',
+                'meta_description' => 'Auditoría técnica de Cloudways. Evaluamos rendimiento TTFB, servidores en la nube gestionados, pros, contras y precios desde $14/mes.',
             ],
             'hetzner' => [
                 'plan' => 'Cloud Server CX22 (vCPU AMD + 4GB RAM)',
@@ -216,8 +216,8 @@ PROMPT;
                 'pros' => "• Rendimiento por euro insuperable en servidores VPS dedicados y cloud\n• Almacenamiento NVMe ultrarrápido y red de 10 Gbit/s\n• Tráfico mensual de hasta 20 TB incluido de serie\n• Protección DDoS perimetral de nivel carrier sin sobrecoste",
                 'cons' => "• Dirigido a desarrolladores y administradores; no incluye soporte guiado a nivel aplicación\n• El proceso de verificación de cuenta inicial puede requerir documentación",
                 'verdict' => 'Imbatible para desarrolladores, proyectos Docker y arquitecturas personalizadas que buscan la máxima potencia al menor coste del mercado.',
-                'meta_title' => "Hetzner Cloud: Auditoría y Benchmark TTFB — DebateHosting",
-                'meta_description' => "Analizamos los servidores VPS y dedicados de Hetzner. Puntuaciones de velocidad de CPU NVMe, precios desde 4€ y veredicto para programadores."
+                'meta_title' => 'Hetzner Cloud: Auditoría y Benchmark TTFB — DebateHosting',
+                'meta_description' => 'Analizamos los servidores VPS y dedicados de Hetzner. Puntuaciones de velocidad de CPU NVMe, precios desde 4€ y veredicto para programadores.',
             ],
             'banahosting' => [
                 'plan' => 'Bana Professional SSD',
@@ -234,8 +234,8 @@ PROMPT;
                 'pros' => "• Servidores LiteSpeed Enterprise con soporte nativo de LSCache\n• Sitios web ilimitados y almacenamiento SSD NVMe generoso\n• Certificados SSL gratuitos y migración sin interrupciones\n• Soporte por tickets en español rápido las 24 horas",
                 'cons' => "• El diseño de su portal de clientes y panel comercial es algo anticuado\n• No disponen de soporte mediante chat telefónico directo",
                 'verdict' => 'Muy recomendado para creadores de contenidos, afiliados y nicheros que gestionan múltiples webs bajo un único pago mensual accesible.',
-                'meta_title' => "BanaHosting: Opiniones y Pruebas de Velocidad — DebateHosting",
-                'meta_description' => "Revisión técnica de BanaHosting. Hosting LiteSpeed con cPanel, precios desde $6.95/mes, pros y contras analizados a fondo."
+                'meta_title' => 'BanaHosting: Opiniones y Pruebas de Velocidad — DebateHosting',
+                'meta_description' => 'Revisión técnica de BanaHosting. Hosting LiteSpeed con cPanel, precios desde $6.95/mes, pros y contras analizados a fondo.',
             ],
             'kinsta' => [
                 'plan' => 'WordPress Starter (Google C2)',
@@ -252,8 +252,8 @@ PROMPT;
                 'pros' => "• Infraestructura sobre máquinas Google Cloud C2 de máximo nivel\n• Panel MyKinsta moderno, intuitivo y con herramientas de diagnóstico APM\n• CDN de Cloudflare Enterprise con cortafuegos avanzado y edge caching\n• Soporte técnico de élite compuesto únicamente por ingenieros de WordPress",
                 'cons' => "• Precio de entrada significativamente superior a la media del mercado\n• Límites estrictos en visitas mensuales y espacio en disco según el plan",
                 'verdict' => 'La alternativa indicada para empresas consolidadas, medios con tráfico sensible y tiendas online donde un segundo de caída cuesta miles de euros.',
-                'meta_title' => "Kinsta WordPress: ¿Justifica su Precio Premium? — DebateHosting",
-                'meta_description' => "Auditoría en vivo de Kinsta sobre Google Cloud. Benchmarking TTFB, características de MyKinsta, ventajas y veredicto definitivo."
+                'meta_title' => 'Kinsta WordPress: ¿Justifica su Precio Premium? — DebateHosting',
+                'meta_description' => 'Auditoría en vivo de Kinsta sobre Google Cloud. Benchmarking TTFB, características de MyKinsta, ventajas y veredicto definitivo.',
             ],
             'digitalocean' => [
                 'plan' => 'Basic Droplet (1 vCPU, 1GB RAM)',
@@ -270,9 +270,9 @@ PROMPT;
                 'pros' => "• Despliegue de droplets en menos de 55 segundos mediante imágenes optimizadas\n• Documentación comunitaria técnica considerada de las mejores del mundo\n• Snapshots, redes privadas VPC y almacenamiento en bloques escalable\n• Precios predecibles por horas sin sorpresas en facturación",
                 'cons' => "• Soporte técnico de asistencia básica lento en planes estándar\n• Requiere conocimientos de línea de comandos Linux para la configuración del servidor",
                 'verdict' => 'La elección estándar para programadores web, microservicios y aplicaciones Node.js, Python o PHP que valoran el control total.',
-                'meta_title' => "DigitalOcean Droplets: Opiniones y Rendimiento — DebateHosting",
-                'meta_description' => "Evaluamos la nube de DigitalOcean. Droplets desde $4/mes, benchmarks de disco NVMe, fiabilidad de uptime y comparativa."
-            ]
+                'meta_title' => 'DigitalOcean Droplets: Opiniones y Rendimiento — DebateHosting',
+                'meta_description' => 'Evaluamos la nube de DigitalOcean. Droplets desde $4/mes, benchmarks de disco NVMe, fiabilidad de uptime y comparativa.',
+            ],
         ];
 
         // Buscar coincidencia exacta o parcial en la base de conocimiento
@@ -280,6 +280,7 @@ PROMPT;
             if (str_contains($cleanName, $key) || str_contains($key, $cleanName)) {
                 $preset['name'] = $name;
                 $preset['slug'] = $slug;
+
                 return $preset;
             }
         }
@@ -296,7 +297,7 @@ PROMPT;
             $badgeColor = 'gold';
             $pros = "• Acceso root completo y virtualización KVM sin sobreventa\n• Almacenamiento SSD NVMe de alta tasa de lectura/escritura (IOPS)\n• Conexión de red de 1 Gbps con tráfico abundante o ilimitado\n• Panel para reinstalación de sistemas operativos y backups en caliente";
             $cons = "• Administración técnica a cargo del usuario salvo contratación de soporte gestionado\n• No incluye licencias de paneles comerciales de pago como cPanel";
-            $verdict = "Diseñado para programadores, aplicaciones con backend personalizado y proyectos que superan las capacidades del hosting compartido.";
+            $verdict = 'Diseñado para programadores, aplicaciones con backend personalizado y proyectos que superan las capacidades del hosting compartido.';
         } elseif ($isWp) {
             $plan = 'WordPress Managed SSD';
             $priceFrom = 3.95;
@@ -305,7 +306,7 @@ PROMPT;
             $badgeColor = 'green';
             $pros = "• Optimización específica para el núcleo de WordPress y WooCommerce\n• Sistema de caché a nivel de servidor y actualizaciones automáticas seguras\n• Certificados SSL gratuitos con activación inmediata y copias de seguridad diarias\n• Asistente de migración sin cortes de servicio para webs existentes";
             $cons = "• Recursos de CPU y memoria compartidos con otros usuarios del nodo\n• Precio de renovación superior al coste promocional del primer ciclo";
-            $verdict = "Recomendado para pequeñas empresas, blogs personales y profesionales que buscan rapidez de carga y mantenimiento cero en WordPress.";
+            $verdict = 'Recomendado para pequeñas empresas, blogs personales y profesionales que buscan rapidez de carga y mantenimiento cero en WordPress.';
         } else {
             $plan = 'Plan SSD Estándar';
             $priceFrom = 2.99;
@@ -314,7 +315,7 @@ PROMPT;
             $badgeColor = 'green';
             $pros = "• Almacenamiento en unidades de estado sólido de alta velocidad\n• Panel de control moderno e intuitivo en español para gestión de dominios y bases de datos\n• Instalador automático en 1 clic de WordPress y más de 100 aplicaciones\n• Soporte técnico continuo disponible los 365 días del año";
             $cons = "• El descuento promocional aplica principalmente a contrataciones plurianuales\n• El dominio gratuito requiere renovación al precio regular tras el primer año";
-            $verdict = "Una solución equilibrada y económica para lanzar nuevos sitios web, páginas corporativas y proyectos en fase de crecimiento.";
+            $verdict = 'Una solución equilibrada y económica para lanzar nuevos sitios web, páginas corporativas y proyectos en fase de crecimiento.';
         }
 
         $desc = "{$name} ofrece infraestructura de alojamiento web con un equilibrio competitivo entre coste y prestaciones. Sus servidores cuentan con almacenamiento de estado sólido, cortafuegos web activo y paneles de gestión optimizados para agilizar la administración de páginas y cuentas de correo.";
@@ -327,9 +328,9 @@ PROMPT;
             'price_before' => $priceBefore,
             'period' => 'mes',
             'score_precio' => round(8.0 + (crc32($name) % 15) / 10, 1),
-            'score_rendimiento' => round(8.2 + (crc32($name . 'perf') % 15) / 10, 1),
-            'score_soporte' => round(8.0 + (crc32($name . 'sup') % 15) / 10, 1),
-            'score_facilidad' => round(8.3 + (crc32($name . 'ease') % 12) / 10, 1),
+            'score_rendimiento' => round(8.2 + (crc32($name.'perf') % 15) / 10, 1),
+            'score_soporte' => round(8.0 + (crc32($name.'sup') % 15) / 10, 1),
+            'score_facilidad' => round(8.3 + (crc32($name.'ease') % 12) / 10, 1),
             'uptime' => 99.96,
             'badge' => $badge,
             'badge_color' => $badgeColor,
@@ -425,7 +426,6 @@ PROMPT;
 
         return null;
     }
-
 
     /**
      * Llamada a OpenAI para redactar Reseña Editorial
@@ -527,13 +527,13 @@ PROMPT;
                 'slug' => $slug,
                 'target_category' => 'wordpress',
                 'rating' => 9.3,
-                'summary' => "Hostinger se ha consolidado como la opción de referencia en hosting económico y de alto rendimiento gracias a su servidor LiteSpeed, discos NVMe y el intuitivo panel hPanel. Analizamos sus pruebas de velocidad reales, estabilidad de red y costes tras la renovación.",
+                'summary' => 'Hostinger se ha consolidado como la opción de referencia en hosting económico y de alto rendimiento gracias a su servidor LiteSpeed, discos NVMe y el intuitivo panel hPanel. Analizamos sus pruebas de velocidad reales, estabilidad de red y costes tras la renovación.',
                 'content' => "1. INTRODUCCIÓN Y ARQUITECTURA TÉCNICA\nHostinger ha evolucionado de ser un proveedor de entrada a competir de tú a tú con marcas premium del sector. Su infraestructura actual se basa en servidores web LiteSpeed Enterprise acoplados a almacenamiento en unidades SSD NVMe de última generación. Esto se traduce en una capacidad de procesamiento de peticiones dinámicas muy superior a las tradicionales configuraciones con Apache. Además, cuentan con múltiples centros de datos estratégicamente repartidos en Europa, Estados Unidos, Asia y América Latina.\n\n2. PRUEBAS DE RENDIMIENTO Y VELOCIDAD TTFB\nEn nuestras pruebas de laboratorio independientes, Hostinger ha registrado un Time To First Byte (TTFB) promedio situado entre los 180 ms y 240 ms, situándose en el rango excelente para alojamiento compartido y cloud. La integración nativa con el plugin LSCache para WordPress permite servir páginas cacheadas prácticamente al instante, reduciendo el consumo de RAM y CPU del servidor bajo picos moderados de tráfico.\n\n3. PANEL DE CONTROL Y EXPERIENCIA DE USUARIO (hPanel)\nA diferencia de otros competidores que aún arrastran licencias tradicionales de cPanel, Hostinger apuesta por su propio panel de desarrollo interno: hPanel. Es una interfaz moderna, limpia y en español que simplifica drásticamente tareas complejas como la creación de cuentas de correo, gestión de certificados SSL automáticos, staging para desarrollo seguro y copias de seguridad semanales o diarias.\n\n4. SOPORTE TÉCNICO Y ATENCIÓN AL CLIENTE\nEl servicio de atención al usuario opera exclusivamente a través de chat en vivo las 24 horas del día, los 7 días de la semana. Los tiempos de primera respuesta suelen rondar entre los 3 y 8 minutos. Si bien no ofrecen asistencia telefónica, el equipo de soporte técnico cuenta con operadores hispanohablantes competentes y una base de conocimientos documentada exhaustivamente con tutoriales paso a paso.\n\n5. POLÍTICA DE PRECIOS, RENOVACIONES Y COSTES OCULTOS\nEl punto más atractivo de Hostinger es su precio promocional de entrada, accesible desde contrataciones plurianuales. Incluyen registro de dominio gratuito el primer año y migración asistida sin coste. No obstante, es fundamental tener en cuenta que las renovaciones implican un incremento sobre la tarifa inicial, una práctica estándar en la industria pero que conviene planificar con antelación.",
                 'pros' => "• Servidores LiteSpeed con almacenamiento NVMe de máxima velocidad\n• Panel hPanel extremadamente intuitivo, moderno y en español\n• Excelente relación calidad/precio con dominio y SSL gratuitos\n• Copias de seguridad automáticas y migración gratuita de webs existentes",
                 'cons' => "• No ofrece panel cPanel tradicional (aunque hPanel lo supera en usabilidad)\n• No dispone de soporte telefónico directo, únicamente chat 24/7 y tickets\n• El mayor descuento requiere contratación inicial de largo plazo",
-                'verdict' => "Hostinger es la recomendación número uno para creadores de contenido, pequeñas y medianas empresas, tiendas WooCommerce y profesionales independientes que buscan máxima velocidad y fiabilidad sin pagar los precios exorbitantes de los servicios gestionados tradicionales.",
+                'verdict' => 'Hostinger es la recomendación número uno para creadores de contenido, pequeñas y medianas empresas, tiendas WooCommerce y profesionales independientes que buscan máxima velocidad y fiabilidad sin pagar los precios exorbitantes de los servicios gestionados tradicionales.',
                 'meta_title' => "Opiniones de Hostinger ({$currentYear}): ¿Vale la Pena? — Reseña DebateHosting",
-                'meta_description' => "Auditoría técnica independiente sobre Hostinger. Analizamos velocidad TTFB en LiteSpeed, facilidad de hPanel, precios reales y veredicto editorial.",
+                'meta_description' => 'Auditoría técnica independiente sobre Hostinger. Analizamos velocidad TTFB en LiteSpeed, facilidad de hPanel, precios reales y veredicto editorial.',
             ];
         }
 
@@ -544,13 +544,13 @@ PROMPT;
                 'slug' => $slug,
                 'target_category' => 'wordpress',
                 'rating' => 9.4,
-                'summary' => "SiteGround destaca como una de las plataformas más refinadas para WordPress gracias a su infraestructura montada sobre Google Cloud Platform, su optimizador SuperCacher y una atención al cliente de primer nivel internacional.",
+                'summary' => 'SiteGround destaca como una de las plataformas más refinadas para WordPress gracias a su infraestructura montada sobre Google Cloud Platform, su optimizador SuperCacher y una atención al cliente de primer nivel internacional.',
                 'content' => "1. INTRODUCCIÓN Y ARQUITECTURA TÉCNICA\nSiteGround aloja la totalidad de su infraestructura sobre los centros de datos de Google Cloud Platform (GCP). Esto le confiere una red global de fibra óptica de latencia mínima, redundancia geográfica total y un compromiso medioambiental del 100% con energías renovables. Cada cuenta opera en contenedores aislados de Linux con cortafuegos perimetral proactivo.\n\n2. VELOCIDAD Y EL SISTEMA SUPERCACHER\nLa clave del sobresaliente rendimiento de SiteGround reside en su módulo de optimización propietario: SuperCacher. Implementa almacenamiento en memoria caché NGINX Direct Delivery para archivos estáticos y memoria Memcached para acelerar consultas complejas de bases de datos MySQL, logrando que sitios WordPress y tiendas WooCommerce respondan con una agilidad pasmosa.\n\n3. PANEL SITE TOOLS Y HERRAMIENTAS DE DESARROLLO\nAbandonando el clásico cPanel hace años, SiteGround diseñó 'Site Tools', un panel modular enfocado en la productividad. Ofrece copias de seguridad automáticas diarias con restauración en un clic, entornos de pruebas (staging) instantáneos, integración con repositorios Git y colaboración entre miembros de equipo o clientes sin necesidad de compartir contraseñas maestras.\n\n4. EL MEJOR SOPORTE TÉCNICO DE LA INDUSTRIA\nSi hay un apartado donde SiteGround no tiene rival es en su soporte técnico multicanal 24/7. Tanto por chat inmediato como por tickets o teléfono, los ingenieros de soporte resuelven problemas avanzados de WordPress, php.ini y certificados SSL en cuestión de minutos, con una amabilidad y solvencia técnica encomiables.\n\n5. PRECIOS DE ENTRADA VS RENOVACIÓN\nEl gran punto de fricción de SiteGround radica en su estructura de tarifas. Ofrecen un agresivo descuento promocional durante el primer periodo de contratación, pero el coste de renovación posterior se multiplica considerablemente. Es un hosting de gama alta cuyo valor se justifica si priorizas la paz mental y la excelencia en el soporte.",
                 'pros' => "• Infraestructura global montada íntegramente sobre Google Cloud Platform\n• Sistema SuperCacher y optimizaciones a nivel de servidor ultra veloces\n• Soporte técnico sobresaliente las 24 horas con resolución inmediata\n• Entornos de Staging, backups automáticos y herramientas avanzadas de staging",
                 'cons' => "• Precios de renovación notablemente superiores a la media de hosting compartido\n• Límites estrictos de espacio de almacenamiento en los planes de inicio\n• Dominio web no incluido gratuitamente de forma indefinida",
-                'verdict' => "SiteGround es la elección predilecta para agencias, negocios online y proyectos corporativos donde la caída del servicio o un fallo técnico cuesta dinero, y donde la calidad impecable del soporte técnico compensa con creces el precio de renovación.",
+                'verdict' => 'SiteGround es la elección predilecta para agencias, negocios online y proyectos corporativos donde la caída del servicio o un fallo técnico cuesta dinero, y donde la calidad impecable del soporte técnico compensa con creces el precio de renovación.',
                 'meta_title' => "Reseña de SiteGround ({$currentYear}): Análisis y Opiniones Reales — DebateHosting",
-                'meta_description' => "Auditoría profunda de SiteGround. Evaluamos la arquitectura sobre Google Cloud, SuperCacher, calidad del soporte técnico y el impacto de sus renovaciones.",
+                'meta_description' => 'Auditoría profunda de SiteGround. Evaluamos la arquitectura sobre Google Cloud, SuperCacher, calidad del soporte técnico y el impacto de sus renovaciones.',
             ];
         }
 
@@ -561,13 +561,13 @@ PROMPT;
                 'slug' => $slug,
                 'target_category' => 'hosting',
                 'rating' => 9.1,
-                'summary' => "BanaHosting se ha ganado el respeto unánime de webmasters y profesionales del SEO por su fiabilidad inquebrantable, espacio no medido, cPanel clásico completo y excelente rendimiento sin limitaciones artificiales absurdas.",
+                'summary' => 'BanaHosting se ha ganado el respeto unánime de webmasters y profesionales del SEO por su fiabilidad inquebrantable, espacio no medido, cPanel clásico completo y excelente rendimiento sin limitaciones artificiales absurdas.',
                 'content' => "1. INTRODUCCIÓN Y ENFOQUE OPERATIVO\nBanaHosting es un clásico consolidado entre desarrolladores y creadores de redes de sitios web. Su propuesta huye de florituras comerciales y se centra en proporcionar servidores robustos, almacenamiento en discos SSD de alta resistencia y una política flexible que permite alojar múltiples páginas web bajo un único plan compartido sin sobrecostes ocultos.\n\n2. RENDIMIENTO Y SERVIDORES LITESPEED\nEquipado con LiteSpeed Web Server y CloudLinux OS, BanaHosting garantiza el aislamiento estricto de recursos por cuenta. Incluso en situaciones de alto volumen de visitas simultáneas en proyectos de blogs o marketing de afiliados, el tiempo de respuesta se mantiene estable con valores TTFB por debajo de los 260 ms en centros de datos de Estados Unidos y Europa.\n\n3. PANEL CPANEL ILIMITADO Y LIBERTAD TOTAL\nPara quienes prefieren el entorno cPanel de toda la vida, BanaHosting es un refugio perfecto. Ofrece acceso completo a phpMyAdmin, gestión avanzada de registros DNS, selector de versiones PHP desde 7.4 hasta las últimas versiones 8.x, instalador Softaculous y certificados SSL Let's Encrypt ilimitados que se renuevan solos.\n\n4. SOPORTE TÉCNICO EN ESPAÑOL VÍA TICKET\nA diferencia de otras empresas que priorizan chatbots o chats superficiales, BanaHosting trabaja principalmente con un sistema de tickets ágil y directo. Los técnicos responden habitualmente en menos de 10 a 15 minutos en perfecto español, resolviendo problemas a nivel de servidor de forma directa y sin rodeos burocráticos.\n\n5. PRECIOS TRANSPARENTES Y SIN SORPRESAS\nUna de las mayores virtudes de BanaHosting es la honestidad de sus tarifas: lo que pagas al contratar es prácticamente lo mismo que pagarás en cada renovación. No existen subidas desmedidas ni trucos de facturación, lo que lo convierte en uno de los hostings más rentables a largo plazo.",
                 'pros' => "• Permite alojar sitios web ilimitados con excelente asignación de recursos\n• Servidores LiteSpeed con cPanel clásico completo y Softaculous\n• Soporte técnico por tickets muy rápido, técnico y en español\n• Precios de renovación estables sin subidas abusivas",
                 'cons' => "• No dispone de chat en vivo para consultas inmediatas\n• La interfaz del área de clientes es funcional pero de diseño tradicional\n• Los centros de datos están concentrados principalmente en EE.UU. y Europa",
-                'verdict' => "BanaHosting es la alternativa más inteligente y económica para nicheros, afiliados, agencias de marketing y propietarios de múltiples webs que buscan estabilidad sólida y cPanel sin pagar renovaciones abusivas.",
+                'verdict' => 'BanaHosting es la alternativa más inteligente y económica para nicheros, afiliados, agencias de marketing y propietarios de múltiples webs que buscan estabilidad sólida y cPanel sin pagar renovaciones abusivas.',
                 'meta_title' => "Opiniones de BanaHosting ({$currentYear}): Análisis y Veredicto — DebateHosting",
-                'meta_description' => "Auditoría exhaustiva sobre BanaHosting. Evaluamos LiteSpeed, rendimiento con cPanel, soporte por tickets en español y precios estables.",
+                'meta_description' => 'Auditoría exhaustiva sobre BanaHosting. Evaluamos LiteSpeed, rendimiento con cPanel, soporte por tickets en español y precios estables.',
             ];
         }
 
@@ -578,13 +578,13 @@ PROMPT;
                 'slug' => $slug,
                 'target_category' => 'cloud',
                 'rating' => 9.3,
-                'summary' => "Cloudways elimina la complejidad de administrar servidores cloud no gestionados, permitiéndote desplegar instancias de DigitalOcean, AWS o Google Cloud con panel optimizado, caché Breeze y escalabilidad vertical en un clic.",
+                'summary' => 'Cloudways elimina la complejidad de administrar servidores cloud no gestionados, permitiéndote desplegar instancias de DigitalOcean, AWS o Google Cloud con panel optimizado, caché Breeze y escalabilidad vertical en un clic.',
                 'content' => "1. ARQUITECTURA CLOUD GESTIONADA\nCloudways actúa como una capa de abstracción e infraestructura gestionada sobre los mejores proveedores de nube del mundo: DigitalOcean, Linode/Akamai, Vultr, AWS y Google Cloud. Permite disfrutar de los recursos dedicados, discos NVMe y redes ultrarrápidas de la nube pública sin tener que tocar la línea de comandos de Linux ni preocuparse por parches de seguridad del kernel.\n\n2. RENDIMIENTO CON LA PILA THUNDERSTACK\nLa configuración de servidor de Cloudways combina Nginx como proxy inverso, Apache en backend, PHP-FPM, MySQL/MariaDB y caché en memoria Redis / Varnish. Esta combinación, denominada ThunderStack, entrega tiempos de carga asombrosos con latencias TTFB de nivel empresarial incluso bajo tráfico pesado.\n\n3. PANEL DE CONTROL Y DESPLIEGUE EN 1 CLIC\nEl panel de Cloudways es intuitivo y extremadamente potente para agencias y programadores. Permite clonar servidores completos en minutos, crear entornos de staging con sincronización bidireccional, gestionar certificados SSL gratuitos y escalar memoria RAM o almacenamiento con un deslizador sin migraciones traumáticas.\n\n4. MODELO DE FACTURACIÓN PAY-AS-YOU-GO\nUna ventaja radical frente al hosting tradicional es su modelo de pago por uso por horas o meses. No hay contratos anuales obligatorios ni penalizaciones por cancelación. Solo pagas exactamente por los recursos que el servidor consume durante el periodo activo.\n\n5. SOPORTE Y CONSIDERACIONES TÉCNICAS\nEl soporte estándar cubre la operativa de la plataforma mediante chat 24/7. Sin embargo, no incluye asistencia con el código interno de las aplicaciones web a menos que se contrate el paquete de soporte avanzado. Tampoco incluye servicio de correo electrónico en el servidor (requiere integración con complementos como Rackspace o Elastic Email).",
                 'pros' => "• Servidores cloud dedicados sobre DigitalOcean, Vultr, AWS o Google Cloud\n• Pila optimizada con Varnish, Redis y Nginx para velocidad extrema\n• Escalabilidad vertical inmediata y facturación por horas (sin permanencias)\n• Herramientas profesionales de Staging, clonación y gestión de equipos",
                 'cons' => "• No incluye alojamiento de correo electrónico nativo (requiere addon externo)\n• Curva de aprendizaje ligeramente superior al hosting compartido básico\n• Soporte avanzado con ingenieros sénior reservado a planes de pago extra",
-                'verdict' => "Cloudways es la plataforma ideal para desarrolladores, tiendas de comercio electrónico de alto tráfico y agencias digitales que requieren potencia cloud dedicada con la comodidad de un panel totalmente gestionado.",
+                'verdict' => 'Cloudways es la plataforma ideal para desarrolladores, tiendas de comercio electrónico de alto tráfico y agencias digitales que requieren potencia cloud dedicada con la comodidad de un panel totalmente gestionado.',
                 'meta_title' => "Reseña de Cloudways ({$currentYear}): Análisis Cloud Gestionado — DebateHosting",
-                'meta_description' => "Auditoría técnica de Cloudways. Analizamos velocidad sobre DigitalOcean y AWS, stack con Redis/Varnish, facturación pay-as-you-go y veredicto.",
+                'meta_description' => 'Auditoría técnica de Cloudways. Analizamos velocidad sobre DigitalOcean y AWS, stack con Redis/Varnish, facturación pay-as-you-go y veredicto.',
             ];
         }
 
@@ -595,13 +595,13 @@ PROMPT;
                 'slug' => $slug,
                 'target_category' => 'offshore',
                 'rating' => 8.8,
-                'summary' => "Alexhost se ha posicionado como uno de los líderes indiscutibles en hosting y VPS offshore gracias a su propio centro de datos en Moldavia, política estricta de protección de privacidad, admisión de criptomonedas y tolerancia DMCA regulada.",
+                'summary' => 'Alexhost se ha posicionado como uno de los líderes indiscutibles en hosting y VPS offshore gracias a su propio centro de datos en Moldavia, política estricta de protección de privacidad, admisión de criptomonedas y tolerancia DMCA regulada.',
                 'content' => "1. INFRAESTRUCTURA PROPIA Y JURISDICCIÓN OFFSHORE\nA diferencia de intermediarios o revendedores, Alexhost posee y opera su propio centro de datos ubicado en Chisináu, República de Moldavia. Al operar fuera de la jurisdicción directa de Estados Unidos y de la Unión Europea, ofrece un marco legal privilegiado para proyectos que priorizan la libertad de expresión, la privacidad de datos y la neutralidad de red.\n\n2. PRIVACIDAD TOTAL Y MÉTODOS DE PAGO ANÓNIMOS\nEl registro en Alexhost respeta el anonimato del usuario: no exige documentación personal invasiva ni verificaciones telefónicas. Además de tarjetas convencionales, acepta pagos con Bitcoin, Monero, USDT y múltiples criptomonedas, garantizando que la titularidad del servicio no quede vinculada a identidades bancarias.\n\n3. RENDIMIENTO Y SERVIDORES VPS KVM\nEn el plano técnico, Alexhost ofrece servidores compartidos con LiteSpeed y cPanel, así como servidores VPS basados en virtualización KVM con núcleos dedicados y almacenamiento SSD NVMe. La conectividad cuenta con múltiples enlaces troncales y protección anti-DDoS volumétrica incluida por defecto.\n\n4. POLÍTICA DE CONTENIDO Y GESTIÓN DMCA\nAlexhost aplica una política tolerante con avisos DMCA extranjeros siempre que no violen las leyes locales moldavas (se prohíbe terminantemente el phishing, malware, spam y pornografía infantil). Esto proporciona un entorno seguro para webmasters que enfrentan reclamaciones abusivas de derechos de autor o censura previa.\n\n5. SOPORTE TÉCNICO Y ATENCIÓN AL CLIENTE\nEl equipo de soporte atiende vía tickets y chat en inglés y ruso. Los tiempos de respuesta son razonables para consultas técnicas de infraestructura, aunque no se trata de un servicio gestionado para asistencia en código o diseño de aplicaciones.",
                 'pros' => "• Centro de datos propio en Moldavia bajo legislación offshore protectora\n• Política de privacidad estricta y tolerancia ante reclamaciones DMCA abusivas\n• Aceptación de pagos con Bitcoin, Monero y criptomonedas sin KYC invasivo\n• Almacenamiento NVMe y protección contra ataques DDoS incluida",
                 'cons' => "• Soporte técnico principalmente en inglés y enfocado a nivel de servidor\n• Latencia ligeramente superior para audiencias concentradas en América Latina\n• No es un hosting gestionado para usuarios principiantes sin experiencia básica",
-                'verdict' => "Alexhost es la opción de referencia para profesionales que necesitan hosting offshore fiable, proyectos de libertad de expresión, contenido alternativo o máxima confidencialidad financiera y técnica.",
+                'verdict' => 'Alexhost es la opción de referencia para profesionales que necesitan hosting offshore fiable, proyectos de libertad de expresión, contenido alternativo o máxima confidencialidad financiera y técnica.',
                 'meta_title' => "Opiniones de Alexhost ({$currentYear}): Hosting Offshore y Privacidad — DebateHosting",
-                'meta_description' => "Auditoría técnica sobre Alexhost. Evaluamos centro de datos en Moldavia, política DMCA ignore, pagos en criptomonedas y velocidad real.",
+                'meta_description' => 'Auditoría técnica sobre Alexhost. Evaluamos centro de datos en Moldavia, política DMCA ignore, pagos en criptomonedas y velocidad real.',
             ];
         }
 
@@ -812,9 +812,9 @@ PROMPT;
      */
     public function getGeminiConfig(): array
     {
-        $apiKey = \App\Models\Setting::get('gemini_api_key', config('services.gemini.api_key', ''));
-        $model = \App\Models\Setting::get('gemini_model', config('services.gemini.model', 'gemini-2.5-flash'));
-        $temperature = (float) \App\Models\Setting::get('gemini_temperature', 0.4);
+        $apiKey = Setting::get('gemini_api_key', config('services.gemini.api_key', ''));
+        $model = Setting::get('gemini_model', config('services.gemini.model', 'gemini-2.5-flash'));
+        $temperature = (float) Setting::get('gemini_temperature', 0.4);
 
         return [
             'api_key' => $apiKey,
@@ -841,7 +841,7 @@ PROMPT;
 
         try {
             $url = "https://generativelanguage.googleapis.com/v1beta/models/{$mdl}:generateContent?key={$key}";
-            $client = method_exists($this, 'httpClient') ? $this->httpClient() : \Illuminate\Support\Facades\Http::timeout(15);
+            $client = method_exists($this, 'httpClient') ? $this->httpClient() : Http::timeout(15);
             $response = $client->post($url, [
                 'contents' => [
                     [
@@ -869,7 +869,7 @@ PROMPT;
         } catch (\Throwable $e) {
             return [
                 'success' => false,
-                'message' => 'Excepción de conexión: ' . $e->getMessage(),
+                'message' => 'Excepción de conexión: '.$e->getMessage(),
             ];
         }
     }

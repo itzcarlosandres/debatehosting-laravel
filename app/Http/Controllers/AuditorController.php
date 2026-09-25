@@ -22,7 +22,7 @@ class AuditorController extends Controller
         $clean = explode('/', $clean)[0];
         $clean = strtolower(trim($clean));
 
-        if (empty($clean) || !str_contains($clean, '.')) {
+        if (empty($clean) || ! str_contains($clean, '.')) {
             return response()->json(['error' => 'Por favor introduce un dominio válido (ej: miweb.com).'], 422);
         }
 
@@ -31,7 +31,7 @@ class AuditorController extends Controller
 
         // Medición de latencia básica TTFB
         $startTime = microtime(true);
-        $ch = curl_init("https://" . $clean);
+        $ch = curl_init('https://'.$clean);
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_TIMEOUT => 5,
@@ -54,7 +54,7 @@ class AuditorController extends Controller
             'domain' => $clean,
             'ip' => $hasDns ? $ip : 'No resuelta',
             'http_code' => $httpCode > 0 ? $httpCode : 'Sin respuesta',
-            'ttfb' => $ttfb > 0 ? $ttfb . ' ms' : 'N/A',
+            'ttfb' => $ttfb > 0 ? $ttfb.' ms' : 'N/A',
             'ssl' => $httpCode > 0,
             'server' => $serverHeader,
             'status' => $httpCode >= 200 && $httpCode < 400 ? 'online' : 'unreachable',

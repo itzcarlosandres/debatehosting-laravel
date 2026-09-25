@@ -13,7 +13,7 @@ class AdminProviderController extends Controller
 {
     public function index()
     {
-        $providers = Provider::orderBy('name')->get();
+        $providers = Provider::latest()->get();
 
         return view('admin.providers.index', compact('providers'));
     }

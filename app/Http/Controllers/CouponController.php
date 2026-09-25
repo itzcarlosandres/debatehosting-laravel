@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
 use App\Models\Coupon;
 use App\Models\Setting;
 use Illuminate\Http\Request;
@@ -21,11 +20,11 @@ class CouponController extends Controller
             $search = $request->q;
             $query->where(function ($q) use ($search) {
                 $q->where('code', 'like', "%{$search}%")
-                  ->orWhere('discount', 'like', "%{$search}%")
-                  ->orWhere('condition', 'like', "%{$search}%")
-                  ->orWhereHas('provider', function ($pq) use ($search) {
-                      $pq->where('name', 'like', "%{$search}%");
-                  });
+                    ->orWhere('discount', 'like', "%{$search}%")
+                    ->orWhere('condition', 'like', "%{$search}%")
+                    ->orWhereHas('provider', function ($pq) use ($search) {
+                        $pq->where('name', 'like', "%{$search}%");
+                    });
             });
         }
 
