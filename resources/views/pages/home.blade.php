@@ -483,13 +483,8 @@
                                                     <span class="badge-pill badge-sky" style="font-size: 0.65rem; padding: 0.1rem 0.45rem; font-weight: 800;">NUEVO</span>
                                                 @endif
                                             </div>
-                                            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.15rem; display: flex; align-items: center; gap: 0.45rem;">
+                                            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.15rem;">
                                                 <span>{{ $p->plan }}</span>
-                                                <span style="opacity: 0.4;">•</span>
-                                                <span style="display: inline-flex; align-items: center; gap: 0.25rem; font-family: var(--font-mono); color: var(--emerald-primary); font-size: 0.74rem;">
-                                                    <span class="pulse-dot-anim" style="width: 5px; height: 5px;"></span>
-                                                    <span>{{ $p->uptime }}% uptime</span>
-                                                </span>
                                             </div>
                                         </div>
                                     </div>
