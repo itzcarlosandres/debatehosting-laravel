@@ -222,7 +222,7 @@
                 <label class="form-label" for="email">Correo Electrónico</label>
                 <div class="input-wrap">
                     <i data-lucide="mail" class="input-icon" style="width: 15px; height: 15px;"></i>
-                    <input type="email" id="email" name="email" value="{{ old('email') }}" required autofocus class="form-control" placeholder="itzcarlosandres@gmail.com">
+                    <input type="email" id="email" name="email" value="{{ old('email') }}" required autofocus class="form-control" placeholder="correo@ejemplo.com">
                 </div>
             </div>
 

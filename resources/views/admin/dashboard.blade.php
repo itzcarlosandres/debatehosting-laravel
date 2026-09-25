@@ -28,11 +28,11 @@
     }
 
     .dashboard-title {
-        font-size: 1.95rem;
+        font-size: clamp(1.4rem, 4vw, 1.95rem);
         font-weight: 800;
         color: #FFFFFF;
         letter-spacing: -0.025em;
-        line-height: 1.15;
+        line-height: 1.2;
     }
 
     /* Grilla de 8 KPIs */
@@ -277,6 +277,43 @@
 
     .telemetry-table tr:hover td {
         background-color: var(--bg-hover);
+    }
+
+    @media (max-width: 640px) {
+        .dashboard-header-wrap {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 1rem;
+        }
+        .dashboard-header-wrap button {
+            width: 100%;
+            justify-content: center;
+        }
+        .barchart-container {
+            padding: 1.25rem 0.5rem 0.75rem 0.5rem;
+            height: 155px;
+        }
+        .barchart-bar {
+            width: 18px;
+        }
+        .barchart-count {
+            font-size: 0.68rem;
+        }
+        .barchart-label {
+            font-size: 0.65rem;
+        }
+        .dash-section-header {
+            padding: 1rem;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .top-provider-item {
+            padding: 0.75rem 1rem;
+        }
+        .telemetry-table th,
+        .telemetry-table td {
+            padding: 0.75rem 1rem;
+        }
     }
 </style>
 

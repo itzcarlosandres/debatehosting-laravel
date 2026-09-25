@@ -32,7 +32,8 @@
             /* Tipografía */
             --text-main: #F3F4F6;
             --text-muted: #9CA3AF;
-            --text-dim: #6B7280;
+            --text-dim: #94A3B8;
+            --text-dimmer: #64748B;
 
             /* Acentos */
             --emerald-primary: #10B981;
@@ -91,7 +92,7 @@
             bottom: 0;
             left: 0;
             z-index: 50;
-            transition: transform 0.2s ease;
+            transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease;
         }
 
         .sidebar-header {
@@ -99,8 +100,72 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 1.5rem;
+            padding: 0 1.25rem 0 1.5rem;
             border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-close-btn {
+            display: none;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-muted);
+            width: 34px;
+            height: 34px;
+            border-radius: var(--radius-sm);
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .sidebar-close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #FFFFFF;
+            border-color: var(--border-hover);
+        }
+
+        /* Backdrop translúcido para versión móvil */
+        .sidebar-backdrop {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 45;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        body.sidebar-open .sidebar-backdrop {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        body.sidebar-open {
+            overflow: hidden;
+        }
+
+        /* Botón Hamburguesa Topbar */
+        .topbar-sidebar-toggle {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-card);
+            border: 1px solid var(--border-medium);
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            flex-shrink: 0;
+        }
+
+        .topbar-sidebar-toggle:hover {
+            background: var(--bg-hover);
+            border-color: var(--emerald-primary);
+            color: var(--emerald-primary);
         }
 
         .sidebar-brand {
@@ -177,11 +242,12 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0.6rem 0.75rem;
+            padding: 0.65rem 0.85rem;
+            min-height: 42px;
             border-radius: var(--radius-sm);
             color: var(--text-muted);
             text-decoration: none;
-            font-size: 0.88rem;
+            font-size: 0.9rem;
             font-weight: 500;
             transition: all 0.15s ease;
         }
@@ -805,17 +871,131 @@
         }
 
         @media (max-width: 900px) {
+            .topbar-sidebar-toggle {
+                display: inline-flex;
+            }
+            .sidebar-close-btn {
+                display: inline-flex;
+            }
             .admin-sidebar {
                 transform: translateX(-100%);
+                z-index: 100;
+                box-shadow: 0 0 40px rgba(0, 0, 0, 0.85);
+            }
+            body.sidebar-open .admin-sidebar {
+                transform: translateX(0);
             }
             .admin-main-wrapper {
                 margin-left: 0;
+                width: 100%;
+                min-width: 0;
             }
             .admin-content {
-                padding: 1.5rem 1rem;
+                padding: 1.25rem 1rem 3rem 1rem;
             }
             .admin-topbar {
                 padding: 0 1rem;
+                gap: 0.75rem;
+            }
+            .topbar-left {
+                gap: 0.75rem;
+                min-width: 0;
+                flex: 1;
+            }
+            .topbar-breadcrumbs {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                font-size: 0.82rem;
+            }
+            .topbar-breadcrumbs .current {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .admin-topbar {
+                height: 58px;
+                padding: 0 0.85rem;
+            }
+            .topbar-breadcrumbs a,
+            .topbar-breadcrumbs .breadcrumb-separator {
+                display: none;
+            }
+            .topbar-breadcrumbs .current {
+                font-size: 0.85rem;
+                font-weight: 700;
+            }
+            .live-status-pill .live-status-text {
+                display: none;
+            }
+            .live-status-pill {
+                padding: 0.4rem;
+                border-radius: 50%;
+                justify-content: center;
+            }
+            .btn-view-site span {
+                display: none;
+            }
+            .btn-view-site {
+                padding: 0.45rem;
+                width: 34px;
+                height: 34px;
+                justify-content: center;
+            }
+            .admin-page-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+                margin-bottom: 1.5rem;
+            }
+            .page-header-title {
+                font-size: 1.35rem;
+            }
+            .page-header-subtitle {
+                font-size: 0.82rem;
+            }
+            .page-header-actions {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+            .page-header-actions .btn-primary,
+            .page-header-actions .btn-secondary,
+            .page-header-actions .btn-danger {
+                flex: 1;
+                min-width: 130px;
+                justify-content: center;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 0.85rem;
+            }
+            .table-card-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.75rem;
+                padding: 1rem;
+            }
+            .table-card-header > div {
+                width: 100%;
+            }
+            .table-card-header input {
+                width: 100% !important;
+                box-sizing: border-box;
+            }
+            .form-panel {
+                padding: 1.25rem 1rem;
+            }
+            .form-actions-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .form-actions-bar .btn-primary,
+            .form-actions-bar .btn-secondary {
+                width: 100%;
+                justify-content: center;
             }
         }
 
@@ -968,6 +1148,9 @@
                     </div>
                 </div>
             </a>
+            <button type="button" id="sidebar-close-btn" class="sidebar-close-btn" aria-label="Cerrar menú" title="Cerrar menú">
+                <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+            </button>
         </div>
 
         <!-- Menú de Navegación -->
@@ -1075,36 +1258,34 @@
                         <i data-lucide="log-out" style="width: 14px; height: 14px;"></i>
                     </button>
                 </form>
-            </div>
-
-            <div style="width: 100%;">
-                <a href="{{ route('home') }}" target="_blank" class="btn-secondary" style="width: 100%; justify-content: center; font-size: 0.78rem; padding: 0.4rem 0.5rem; border-color: var(--border-subtle); color: var(--text-muted);">
-                    <i data-lucide="external-link" style="width: 12px; height: 12px;"></i>
-                    <span>Ver Web</span>
-                </a>
-            </div>
         </div>
     </aside>
+
+    <!-- Backdrop translúcido para Menú Móvil -->
+    <div id="sidebar-backdrop" class="sidebar-backdrop" aria-hidden="true"></div>
 
     <!-- Envoltorio Principal -->
     <div class="admin-main-wrapper">
         <!-- Topbar Superior -->
         <header class="admin-topbar">
             <div class="topbar-left">
+                <button type="button" id="sidebar-toggle-btn" class="topbar-sidebar-toggle" aria-label="Abrir menú de navegación" title="Abrir menú">
+                    <i data-lucide="menu" style="width: 19px; height: 19px;"></i>
+                </button>
                 <div class="topbar-breadcrumbs">
                     <a href="{{ route('admin.dashboard') }}">Consola</a>
-                    <span>/</span>
+                    <span class="breadcrumb-separator">/</span>
                     <span class="current">@yield('title', 'Panel')</span>
                 </div>
             </div>
 
             <div class="topbar-right">
-                <div class="live-status-pill">
+                <div class="live-status-pill" title="Monitor activo">
                     <span class="pulse-live-dot"></span>
-                    <span>MONITOR ACTIVO</span>
+                    <span class="live-status-text">MONITOR ACTIVO</span>
                 </div>
 
-                <a href="{{ route('home') }}" target="_blank" class="btn-view-site">
+                <a href="{{ route('home') }}" target="_blank" class="btn-view-site" title="Ver sitio web en vivo">
                     <span>Sitio en Vivo</span>
                     <i data-lucide="external-link" style="width: 13px; height: 13px;"></i>
                 </a>
@@ -1135,12 +1316,64 @@
         </main>
     </div>
 
-    <!-- Inicializar Iconos Lucide -->
+    <!-- Inicializar Iconos Lucide y Control de Menú Móvil -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             if (window.lucide) {
                 lucide.createIcons();
             }
+
+            const toggleBtn = document.getElementById('sidebar-toggle-btn');
+            const closeBtn = document.getElementById('sidebar-close-btn');
+            const backdrop = document.getElementById('sidebar-backdrop');
+
+            function openSidebar() {
+                document.body.classList.add('sidebar-open');
+                if (window.lucide) {
+                    lucide.createIcons();
+                }
+            }
+
+            function closeSidebar() {
+                document.body.classList.remove('sidebar-open');
+            }
+
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    if (document.body.classList.contains('sidebar-open')) {
+                        closeSidebar();
+                    } else {
+                        openSidebar();
+                    }
+                });
+            }
+
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    closeSidebar();
+                });
+            }
+
+            if (backdrop) {
+                backdrop.addEventListener('click', closeSidebar);
+            }
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && document.body.classList.contains('sidebar-open')) {
+                    closeSidebar();
+                }
+            });
+
+            // Cerrar menú al hacer clic en enlaces de navegación en móvil
+            document.querySelectorAll('.admin-sidebar .nav-item-link').forEach(function(link) {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth <= 900) {
+                        closeSidebar();
+                    }
+                });
+            });
         });
     </script>
     @stack('admin-scripts')
