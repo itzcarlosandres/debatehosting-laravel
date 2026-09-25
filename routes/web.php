@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\AdminProviderController;
 use App\Http\Controllers\Admin\AdminReviewController;
 use App\Http\Controllers\Admin\AdminSectionsController;
 use App\Http\Controllers\Admin\AdminSettingsController;
+use App\Http\Controllers\Admin\AdminSubscriberController;
 use App\Http\Controllers\Admin\AiGeneratorController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -95,17 +96,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/sections', [AdminSectionsController::class, 'index'])->name('sections.index');
         Route::post('/sections', [AdminSectionsController::class, 'update'])->name('sections.update');
 
-        // Portada & Secciones (Edición de Textos del Home)
-        Route::get('/sections', [AdminSectionsController::class, 'index'])->name('sections.index');
-        Route::post('/sections', [AdminSectionsController::class, 'update'])->name('sections.update');
-
-        // Portada & Secciones (Edición de Textos del Home)
-        Route::get('/sections', [AdminSectionsController::class, 'index'])->name('sections.index');
-        Route::post('/sections', [AdminSectionsController::class, 'update'])->name('sections.update');
-
-        // Portada & Secciones (Edición de Textos del Home)
-        Route::get('/sections', [AdminSectionsController::class, 'index'])->name('sections.index');
-        Route::post('/sections', [AdminSectionsController::class, 'update'])->name('sections.update');
+        // Suscriptores del Boletín
+        Route::get('/subscribers', [AdminSubscriberController::class, 'index'])->name('subscribers.index');
+        Route::post('/subscribers', [AdminSubscriberController::class, 'store'])->name('subscribers.store');
+        Route::delete('/subscribers/{subscriber}', [AdminSubscriberController::class, 'destroy'])->name('subscribers.destroy');
+        Route::get('/subscribers/export', [AdminSubscriberController::class, 'exportCsv'])->name('subscribers.export');
 
         // Configuraciones de Portada y Sitio
         Route::get('/settings', [AdminSettingsController::class, 'index'])->name('settings');
@@ -113,22 +108,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/settings/clear-cache', [AdminSettingsController::class, 'clearCache'])->name('settings.clear-cache');
         Route::post('/settings/reset-stats', [AdminSettingsController::class, 'resetStats'])->name('settings.reset-stats');
 
-        Route::post('/settings/clear-cache', [AdminSettingsController::class, 'clearCache'])->name('settings.clear-cache');
-        Route::post('/settings/reset-stats', [AdminSettingsController::class, 'resetStats'])->name('settings.reset-stats');
-
-        Route::post('/settings/clear-cache', [AdminSettingsController::class, 'clearCache'])->name('settings.clear-cache');
-        Route::post('/settings/reset-stats', [AdminSettingsController::class, 'resetStats'])->name('settings.reset-stats');
-
-        Route::post('/settings/clear-cache', [AdminSettingsController::class, 'clearCache'])->name('settings.clear-cache');
-        Route::post('/settings/reset-stats', [AdminSettingsController::class, 'resetStats'])->name('settings.reset-stats');
-
         // Asistente IA para Generación de Proveedores y Reseñas
         Route::post('/ai/generate-provider', [AiGeneratorController::class, 'generateProvider'])->name('ai.generate-provider');
         Route::post('/ai/generate-review', [AiGeneratorController::class, 'generateReview'])->name('ai.generate-review');
         Route::post('/ai/test-gemini', [AiGeneratorController::class, 'testGemini'])->name('ai.test-gemini');
-        Route::post('/ai/generate-products', [AiGeneratorController::class, 'generateProducts'])->name('ai.generate-products');
-        Route::post('/ai/generate-products', [AiGeneratorController::class, 'generateProducts'])->name('ai.generate-products');
-        Route::post('/ai/generate-products', [AiGeneratorController::class, 'generateProducts'])->name('ai.generate-products');
         Route::post('/ai/generate-products', [AiGeneratorController::class, 'generateProducts'])->name('ai.generate-products');
     });
 });

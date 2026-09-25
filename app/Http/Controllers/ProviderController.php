@@ -16,7 +16,16 @@ class ProviderController extends Controller
         // Filtro por categoría
         if ($request->filled('categoria') && $request->categoria !== 'todas') {
             $cat = $request->categoria;
-            $query->whereJsonContains('categories', $cat);
+            $query->where(function ($q) use ($cat) {
+                $q->whereJsonContains('categories', $cat)
+                    ->orWhereJsonContains('categories', strtolower($cat))
+                    ->orWhereJsonContains('categories', ucfirst(strtolower($cat)))
+                    ->orWhereJsonContains('categories', strtoupper($cat))
+                    ->orWhereHas('products', function ($pq) use ($cat) {
+                        $pq->where('category_slug', $cat)
+                            ->orWhere('category_slug', strtolower($cat));
+                    });
+            });
         }
 
         // Búsqueda por texto

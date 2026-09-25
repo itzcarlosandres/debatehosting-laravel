@@ -1218,7 +1218,7 @@
                     </div>
                 </a>
 
-                <a href="{{ route('admin.settings', ['tab' => 'engine']) }}" class="nav-item-link">
+                <a href="{{ route('admin.subscribers.index') }}" class="nav-item-link {{ request()->routeIs('admin.subscribers.*') ? 'active' : '' }}">
                     <div class="nav-item-left">
                         <i data-lucide="users" style="width: 15px; height: 15px;"></i>
                         <span>Suscriptores</span>

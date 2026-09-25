@@ -424,148 +424,146 @@
                 $recentProviders = $providers->sortByDesc('id')->values();
             @endphp
 
-            <div class="table-clean-card">
-                <div class="clean-table-responsive">
-                    <table class="clean-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 320px;">Proveedor y Plan</th>
-                                <th>Categorías</th>
-                                <th>Precio / Período</th>
-                                <th>Descuento</th>
-                                <th>Cupón Promocional</th>
-                                <th style="text-align: right; width: 140px;">Enlace Directo</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($recentProviders->take(10) as $index => $p)
-                            @php
-                                $activeCoupon = $p->coupons->where('verified', true)->first() ?? $p->coupons->first();
-                                $cats = is_array($p->categories) ? $p->categories : json_decode($p->categories ?? '[]', true);
-                                if (!is_array($cats)) { $cats = []; }
-                            @endphp
-                            <tr>
-                                <td>
-                                    <div style="display: flex; align-items: center; gap: 0.85rem;">
-                                        @if($p->resolved_logo_url)
-                                            <img src="{{ $p->resolved_logo_url }}" alt="{{ $p->name }}" style="width: 54px; height: 54px; object-fit: contain; background: #FFFFFF; padding: 6px; border-radius: 12px; border: 1px solid var(--border-color); flex-shrink: 0; box-shadow: var(--shadow-sm);">
-                                        @else
-                                            <div style="width: 54px; height: 54px; border-radius: 12px; background: var(--bg-subtle); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.15rem; border: 1px solid var(--border-color); flex-shrink: 0;">
-                                                {{ substr($p->name, 0, 2) }}
-                                            </div>
-                                        @endif
-                                        <div style="min-width: 0;">
-                                            <div style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
-                                                <a href="{{ route('providers.show', $p->slug) }}" style="font-size: 1.05rem; font-weight: 800; color: var(--text-main); text-decoration: none;">
-                                                    {{ $p->name }}
-                                                </a>
+            <div class="split-cards-container">
+                @foreach($recentProviders->take(10) as $index => $p)
+                @php
+                    $activeCoupon = $p->coupons->where('verified', true)->first() ?? $p->coupons->first();
+                    $cats = is_array($p->categories) ? $p->categories : json_decode($p->categories ?? '[]', true);
+                    if (!is_array($cats)) { $cats = []; }
+                    $discountPct = ($p->price_before && $p->price_before > $p->price_from)
+                        ? round((($p->price_before - $p->price_from) / $p->price_before) * 100)
+                        : null;
+                @endphp
+                <div class="split-card-item">
+                    <!-- Bloque 1: Marca, Logo y Calificación -->
+                    <div class="split-brand-pane">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                            <div class="split-logo-wrap">
+                                @if($p->resolved_logo_url)
+                                    <img src="{{ $p->resolved_logo_url }}" alt="{{ $p->name }}" class="split-logo-img">
+                                @else
+                                    <span class="split-logo-fallback">{{ substr($p->name, 0, 2) }}</span>
+                                @endif
+                            </div>
+                            <div style="min-width: 0;">
+                                <div style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
+                                    <a href="{{ route('providers.show', $p->slug) }}" class="split-brand-name">
+                                        {{ $p->name }}
+                                    </a>
 
-                                                @if($p->badge)
-                                                    @php
-                                                        $bUpper = strtoupper($p->badge);
-                                                        $bColor = $p->badge_color ?? ($bUpper === 'HOT' ? 'red' : 'green');
-                                                        $colorMap = [
-                                                            'green' => 'background: rgba(16, 185, 129, 0.08); color: #059669; border: 1px solid rgba(5, 150, 105, 0.4);',
-                                                            'gold' => 'background: rgba(245, 158, 11, 0.08); color: #D97706; border: 1px solid rgba(217, 119, 6, 0.4);',
-                                                            'red' => 'background: #FFF1F2; color: #E11D48; border: 1px solid #FDA4AF;',
-                                                            'dark' => 'background: #F1F5F9; color: #0F172A; border: 1.5px solid #0F172A;',
-                                                            'sky' => 'background: rgba(14, 165, 233, 0.08); color: #0284C7; border: 1px solid rgba(2, 132, 199, 0.4);',
-                                                            'rose' => 'background: #FFF1F2; color: #E11D48; border: 1px solid #FDA4AF;',
-                                                        ];
-                                                        $badgeStyle = $colorMap[$bColor] ?? ($bUpper === 'HOT' ? $colorMap['red'] : $colorMap['green']);
-                                                    @endphp
-                                                    <span style="font-family: var(--font-mono); font-size: 0.65rem; font-weight: 800; padding: 0.12rem 0.45rem; border-radius: 4px; letter-spacing: 0.04em; text-transform: uppercase; {{ $badgeStyle }}">
-                                                        {{ $p->badge }}
-                                                    </span>
-                                                @endif
-
-                                                @if($index < 2 && !$p->badge)
-                                                    <span class="badge-pill badge-sky" style="font-size: 0.65rem; padding: 0.1rem 0.45rem; font-weight: 800;">NUEVO</span>
-                                                @endif
-                                            </div>
-                                            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.15rem;">
-                                                <span>{{ $p->plan }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-
-                                <!-- Categorías -->
-                                <td>
-                                    <div style="display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center;">
-                                        @forelse($cats as $cat)
-                                            <span class="category-table-pill">
-                                                {{ strtoupper($cat) }}
-                                            </span>
-                                        @empty
-                                            <span class="category-table-pill">
-                                                HOSTING
-                                            </span>
-                                        @endforelse
-                                    </div>
-                                </td>
-
-                                <!-- Precio / Período -->
-                                <td>
-                                    <div style="font-family: var(--font-mono); font-size: 1.15rem; font-weight: 800; color: var(--emerald-primary); line-height: 1;">
-                                        ${{ number_format($p->price_from, 2) }}<span style="font-size: 0.78rem; font-weight: 500; color: var(--text-muted);">/{{ $p->period ?? 'mes' }}</span>
-                                    </div>
-                                </td>
-
-                                <!-- Descuento -->
-                                <td>
-                                    @if($activeCoupon && !empty($activeCoupon->discount))
-                                        <span style="font-family: var(--font-mono); font-size: 0.78rem; font-weight: 800; color: var(--emerald-primary); background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); padding: 0.2rem 0.55rem; border-radius: 4px;">
-                                            {{ $activeCoupon->discount }}
-                                        </span>
-                                    @elseif($p->price_before && $p->price_before > $p->price_from)
+                                    @if($p->badge)
                                         @php
-                                            $discountPct = round((($p->price_before - $p->price_from) / $p->price_before) * 100);
+                                            $bUpper = strtoupper($p->badge);
+                                            $bColor = $p->badge_color ?? ($bUpper === 'HOT' ? 'red' : 'green');
+                                            $colorMap = [
+                                                'green' => 'background: rgba(16, 185, 129, 0.08); color: #059669; border: 1px solid rgba(5, 150, 105, 0.4);',
+                                                'gold' => 'background: rgba(245, 158, 11, 0.08); color: #D97706; border: 1px solid rgba(217, 119, 6, 0.4);',
+                                                'red' => 'background: #FFF1F2; color: #E11D48; border: 1px solid #FDA4AF;',
+                                                'dark' => 'background: #F1F5F9; color: #0F172A; border: 1.5px solid #0F172A;',
+                                                'sky' => 'background: rgba(14, 165, 233, 0.08); color: #0284C7; border: 1px solid rgba(2, 132, 199, 0.4);',
+                                                'rose' => 'background: #FFF1F2; color: #E11D48; border: 1px solid #FDA4AF;',
+                                            ];
+                                            $badgeStyle = $colorMap[$bColor] ?? ($bUpper === 'HOT' ? $colorMap['red'] : $colorMap['green']);
                                         @endphp
-                                        <span style="font-family: var(--font-mono); font-size: 0.78rem; font-weight: 800; color: var(--emerald-primary); background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); padding: 0.2rem 0.55rem; border-radius: 4px;">
-                                            {{ $discountPct }}% OFF
+                                        <span class="split-badge-pill" style="{{ $badgeStyle }}">
+                                            {{ $p->badge }}
                                         </span>
-                                    @else
-                                        <span style="font-size: 0.8rem; color: var(--text-dim); font-family: var(--font-mono);">
-                                            Tarifa estándar
-                                        </span>
+                                    @elseif($index < 2)
+                                        <span class="badge-pill badge-sky" style="font-size: 0.65rem; padding: 0.1rem 0.45rem; font-weight: 800;">NUEVO</span>
                                     @endif
-                                </td>
+                                </div>
+                                <div class="split-plan-sub">{{ $p->plan ?? 'Plan Estándar' }}</div>
+                            </div>
+                        </div>
 
-                                <!-- Cupón Promocional -->
-                                <td>
-                                    @if($activeCoupon && !empty($activeCoupon->code))
-                                        <button type="button" 
-                                                onclick="copyVoucher('{{ $activeCoupon->code }}', '{{ route('go', $p->slug) }}')" 
-                                                class="coupon-dashed-pill" 
-                                                title="Copiar cupón y ver oferta">
-                                            <i data-lucide="copy" style="width: 12px; height: 12px;"></i>
-                                            <span>{{ $activeCoupon->code }}</span>
-                                        </button>
-                                    @else
-                                        <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim);">
-                                            Automático
-                                        </span>
-                                    @endif
-                                </td>
+                        <!-- Estrellas y Score -->
+                        <div class="split-rating-row">
+                            <span class="split-stars">★ ★ ★ ★ ★</span>
+                            <span class="split-score-val">{{ $p->overall_score ?? '9.2' }}/10</span>
+                        </div>
+                    </div>
 
-                                <!-- Enlace Directo -->
-                                <td style="text-align: right;">
-                                    <div style="display: inline-flex; align-items: center; gap: 0.45rem; justify-content: flex-end;">
-                                        <a href="{{ route('providers.show', $p->slug) }}" class="btn btn-secondary btn-sm" style="padding: 0.42rem 0.65rem; font-size: 0.76rem;" title="Ver Ficha Técnica">
-                                            <span>Ficha</span>
-                                        </a>
-                                        <a href="{{ route('go', $p->slug) }}" target="_blank" rel="noopener noreferrer" class="btn-ver-web" title="Ir a la web oficial">
-                                            <span>Ver web</span>
-                                            <i data-lucide="external-link" style="width: 12px; height: 12px;"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                    <!-- Bloque 2: Categorías Directas, Ficha Técnica y Certificaciones -->
+                    <div class="split-features-pane">
+                        <div class="split-features-top">
+                            <!-- Categorías directas (sin la palabra 'Categorías:') -->
+                            <div class="split-cats-wrap">
+                                @forelse($cats as $cat)
+                                    <a href="{{ route('ofertas', ['categoria' => strtolower($cat)]) }}" class="split-cat-badge" title="Ver ofertas y productos de {{ strtoupper($cat) }}">
+                                        <i data-lucide="tag" style="width: 10px; height: 10px; color: var(--emerald-primary, #059669);"></i>
+                                        <span>{{ strtoupper($cat) }}</span>
+                                    </a>
+                                @empty
+                                    <a href="{{ route('ofertas', ['categoria' => 'hosting']) }}" class="split-cat-badge" title="Ver ofertas y productos de HOSTING">
+                                        <i data-lucide="tag" style="width: 10px; height: 10px; color: var(--emerald-primary, #059669);"></i>
+                                        <span>HOSTING</span>
+                                    </a>
+                                @endforelse
+                            </div>
+
+                            <a href="{{ route('providers.show', $p->slug) }}" class="split-ficha-link" title="Ver análisis y ficha técnica completa">
+                                <span>Ficha Técnica</span>
+                                <i data-lucide="chevron-right" style="width: 13px; height: 13px;"></i>
+                            </a>
+                        </div>
+
+                        <!-- Fila de Metadatos y Auditoría -->
+                        <div class="split-meta-row">
+                            <div class="split-spec-pill">
+                                <i data-lucide="shield-check" style="width: 13px; height: 13px; color: #10B981;"></i>
+                                <span>Garantía de Devolución</span>
+                            </div>
+                            <div class="split-spec-pill">
+                                <i data-lucide="zap" style="width: 13px; height: 13px; color: #F59E0B;"></i>
+                                <span>Activación Inmediata</span>
+                            </div>
+                            @if($activeCoupon && !empty($activeCoupon->code))
+                                <div class="split-spec-pill" style="color: #059669; font-weight: 700;">
+                                    <i data-lucide="ticket" style="width: 13px; height: 13px;"></i>
+                                    <span>Cupón disponible</span>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Bloque 3: Descuento, Precio, Cupón y Botón de Acción -->
+                    <div class="split-action-pane">
+                        @if($activeCoupon && !empty($activeCoupon->discount))
+                            <span class="split-discount-badge">
+                                {{ $activeCoupon->discount }}
+                            </span>
+                        @elseif($discountPct)
+                            <span class="split-discount-badge">
+                                -{{ $discountPct }}% OFF
+                            </span>
+                        @endif
+
+                        <div class="split-price-box">
+                            <div class="split-price-val">${{ number_format($p->price_from, 2) }}</div>
+                            <span class="split-price-period">/{{ $p->period ?? 'mes' }}</span>
+                        </div>
+
+                        @if($activeCoupon && !empty($activeCoupon->code))
+                            <button type="button" 
+                                    onclick="copyVoucher('{{ $activeCoupon->code }}', '{{ route('go', $p->slug) }}')" 
+                                    class="coupon-dashed-pill split-coupon-btn" 
+                                    title="Copiar cupón y ver oferta">
+                                <i data-lucide="copy" style="width: 11px; height: 11px;"></i>
+                                <span>{{ $activeCoupon->code }}</span>
+                            </button>
+                        @else
+                            <span class="split-auto-discount">
+                                Automático al contratar
+                            </span>
+                        @endif
+
+                        <a href="{{ route('go', $p->slug) }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary split-cta-btn" title="Ir a la web oficial de {{ $p->name }}">
+                            <span>Ver web</span>
+                            <i data-lucide="arrow-up-right" style="width: 13px; height: 13px;"></i>
+                        </a>
+                    </div>
                 </div>
+                @endforeach
             </div>
 
             <div style="text-align: center;">
@@ -641,24 +639,56 @@
 
 
     <!-- =========================================================================
-         7. NEWSLETTER / BOLETÍN EDITORIAL
+         7. NEWSLETTER / BOLETÍN EDITORIAL «EL DEBATE»
          ========================================================================= -->
-    <section class="container">
-        <div class="newsletter-clean-card">
-            <h2 style="font-size: 1.9rem; font-weight: 800; color: #FFFFFF; letter-spacing: -0.02em; margin-bottom: 0.6rem;">
-                {{ $sectionHeaders['news']['titleBefore'] ?? 'Suscríbete al Boletín Técnico de Hosting' }}
-            </h2>
-            <p style="font-size: 0.95rem; color: #94A3B8; max-width: 500px; margin: 0 auto; line-height: 1.6;">
-                {{ $sectionHeaders['news']['subtitle'] ?? 'Recibe semanalmente alertas de caídas masivas de servidores, auditorías de nuevos proveedores y cupones exclusivos probados.' }}
-            </p>
+    <section class="newsletter-fullwidth-section">
+        <div class="container">
+            <div class="newsletter-fullwidth-content">
+                <!-- Badge de Telemetría / Kicker -->
+                <div class="nl-kicker-badge">
+                    <span class="pulse-beacon-emerald" style="width: 7px; height: 7px;"></span>
+                    <span>BOLETÍN SEMANAL TÉCNICO • EDICIÓN DOMINICAL</span>
+                </div>
 
-            <form id="newsletter-form" onsubmit="handleNewsletter(event)" class="newsletter-form-row">
-                <input type="email" id="nl-email" placeholder="tu@email.com" required class="newsletter-clean-input">
-                <button type="submit" class="btn btn-emerald" style="height: 42px;">
-                    <span>Suscribirme</span>
-                </button>
-            </form>
-            <div id="nl-msg" style="display: none; font-size: 0.85rem; margin-top: 0.85rem;"></div>
+                <h2 class="nl-title">
+                    {{ $sectionHeaders['news']['titleBefore'] ?? 'El Debate' }}
+                    <span class="nl-title-gradient">del Hosting</span>
+                </h2>
+
+                <p class="nl-subtitle">
+                    {{ $sectionHeaders['news']['subtitle'] ?? 'Una entrega dominical con bajadas históricas de precios de VPS, auditorías de rendimiento y alertas sobre proveedores que recortan recursos en silencio. Cero spam, baja en un clic.' }}
+                </p>
+
+                <div class="newsletter-box-wrapper">
+                    <form id="newsletter-form" onsubmit="handleNewsletter(event)" class="newsletter-form-modern">
+                        <i data-lucide="mail" class="nl-input-icon"></i>
+                        <input type="email" id="nl-email" placeholder="Introduce tu correo electrónico..." required autocomplete="email" class="newsletter-clean-input">
+                        <button type="submit" id="nl-submit-btn" class="nl-submit-btn">
+                            <span id="nl-btn-text">Suscribirme</span>
+                            <i data-lucide="send" id="nl-btn-icon" style="width: 14px; height: 14px;"></i>
+                        </button>
+                    </form>
+
+                    <!-- Feedback dinámico en la tarjeta -->
+                    <div id="nl-msg" class="nl-feedback-msg"></div>
+
+                    <!-- Chips de Confianza & Micro-garantías -->
+                    <div class="nl-trust-chips">
+                        <div class="nl-trust-chip">
+                            <i data-lucide="shield-check" style="width: 14px; height: 14px; color: var(--emerald-primary);"></i>
+                            <span>Cero Spam Garantizado</span>
+                        </div>
+                        <div class="nl-trust-chip">
+                            <i data-lucide="clock" style="width: 14px; height: 14px; color: var(--sky-primary);"></i>
+                            <span>1 Entrega por Semana</span>
+                        </div>
+                        <div class="nl-trust-chip">
+                            <i data-lucide="check" style="width: 14px; height: 14px; color: #F59E0B;"></i>
+                            <span>Baja Inmediata en 1 Clic</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -679,32 +709,57 @@
         }
     }
 
-    // Suscripción al Boletín por AJAX
+    // Suscripción al Boletín por AJAX con feedback completo
     function handleNewsletter(e) {
         e.preventDefault();
-        const email = document.getElementById('nl-email').value;
+        const emailInput = document.getElementById('nl-email');
+        const submitBtn = document.getElementById('nl-submit-btn');
+        const btnText = document.getElementById('nl-btn-text');
         const msg = document.getElementById('nl-msg');
+
+        const email = emailInput.value.trim();
+        if (!email) return;
+
+        // Estado cargando
+        submitBtn.disabled = true;
+        btnText.innerText = 'Suscribiendo...';
+        msg.style.display = 'none';
 
         fetch('{{ route("api.subscribe") }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Accept': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             },
             body: JSON.stringify({ email: email })
         })
-        .then(r => r.json())
-        .then(data => {
-            msg.style.display = 'block';
-            msg.style.color = '#34D399';
-            msg.innerText = data.message || '¡Te has suscrito con éxito!';
-            document.getElementById('nl-email').value = '';
-            window.showToast('¡Suscripción confirmada! Bienvenido.', 'success');
+        .then(async response => {
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message || 'Error en la solicitud.');
+            }
+            return data;
         })
-        .catch(() => {
-            msg.style.display = 'block';
-            msg.style.color = '#F87171';
-            msg.innerText = 'Error al suscribirte. Inténtalo de nuevo.';
+        .then(data => {
+            msg.className = 'nl-feedback-msg is-success';
+            msg.innerHTML = '<i data-lucide="check-circle" style="width: 16px; height: 16px;"></i> <span>' + (data.message || '¡Te has suscrito con éxito!') + '</span>';
+            msg.style.display = 'inline-flex';
+            emailInput.value = '';
+            window.showToast(data.message || '¡Suscripción confirmada! Bienvenido a El Debate.', 'success');
+            if (window.lucide) lucide.createIcons();
+        })
+        .catch(err => {
+            msg.className = 'nl-feedback-msg is-error';
+            msg.innerHTML = '<i data-lucide="alert-circle" style="width: 16px; height: 16px;"></i> <span>' + (err.message || 'Error al suscribirte. Inténtalo de nuevo.') + '</span>';
+            msg.style.display = 'inline-flex';
+            window.showToast(err.message || 'Error al procesar tu suscripción.', 'error');
+            if (window.lucide) lucide.createIcons();
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            btnText.innerText = 'Suscribirme';
+            if (window.lucide) lucide.createIcons();
         });
     }
 
